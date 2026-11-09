@@ -13,6 +13,9 @@
 
   Usage: double-click RUN_BACKTESTS.bat (in the project folder), or:
     powershell -NoProfile -ExecutionPolicy Bypass -File tools\run_backtests.ps1 [-Symbol XAUUSD.std] [-From 2026.04.01] [-To 2026.08.31]
+                [-Login 2100013908 -Server LirunexLimited-Demo]
+  If a run fails, the script prints the reason from the MT5 log, stops, and (if the cause is the
+  account) offers to retry with an account number you type. The password must be saved in MT5.
 #>
 param(
     [string]   $Symbol   = "XAUUSD.std",
@@ -23,6 +26,9 @@ param(
     [string[]] $Variants = @("A_Baseline", "B_NextCandle", "C_FlatFilter", "D_BreakEven"),
     [string]   $AppData  = $env:APPDATA,
     [string]   $OutRoot  = [Environment]::GetFolderPath("Desktop"),
+    [string]   $Login    = "",
+    [string]   $Server   = "",
+    [int]      $Install  = 0,
     [switch]   $DryRun
 )
 
@@ -35,6 +41,20 @@ $Project = Split-Path -Parent $Here
 
 function Say([string]$msg, [string]$color = "Gray") { Write-Host $msg -ForegroundColor $color }
 function Fail([string]$msg) { Say ""; Say "ERROR: $msg" "Red"; exit 1 }
+
+# Last relevant lines of the MT5 terminal log (UTF-16) written after $since.
+function Get-Mt5Reason([string]$dataDir, [datetime]$since) {
+    $logDir = Join-Path $dataDir "logs"
+    if (-not (Test-Path $logDir)) { return "" }
+    $f = Get-ChildItem -Path $logDir -Filter "*.log" -File -ErrorAction SilentlyContinue |
+         Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if (-not $f -or $f.LastWriteTime -lt $since.AddSeconds(-5)) { return "MT5 wrote nothing to its log (was MT5 still open?)" }
+    $lines = @(Get-Content -Path $f.FullName -Encoding Unicode -ErrorAction SilentlyContinue | Select-Object -Last 60)
+    $hits = @($lines | Where-Object { $_ -match '(?i)tester|not started|account|symbol|config|cannot|failed|error|authoriz' } |
+              Where-Object { $_ -notmatch 'MQL5\.community' } | Select-Object -Last 3)
+    $msgs = @($hits | ForEach-Object { $p = $_ -split "`t"; if ($p.Count -ge 2) { ($p[-2] + ": " + $p[-1]).Trim() } else { $_.Trim() } })
+    return ($msgs -join " | ")
+}
 
 Say "=== ALB FOREX EMA Scalper - automatic backtests ===" "Cyan"
 Say ("Symbol {0} | {1} -> {2} | deposit {3} USD | variants: {4}" -f $Symbol, $From, $To, $Deposit, ($Variants -join ", "))
@@ -67,7 +87,8 @@ Say ""
 Say "MetaTrader 5 installations found:" "Cyan"
 for ($i = 0; $i -lt $found.Count; $i++) { Say ("  [{0}] {1}   (last used {2})" -f ($i + 1), $found[$i].Origin, $found[$i].LastUsed) }
 $pick = $found[0]
-if ($found.Count -gt 1 -and -not $DryRun) {
+if ($Install -ge 1 -and $Install -le $found.Count) { $pick = $found[$Install - 1] }
+elseif ($found.Count -gt 1 -and -not $DryRun) {
     $ans = Read-Host ("Which one has your broker account? Enter number (default 1)")
     if ($ans -match '^\d+$' -and [int]$ans -ge 1 -and [int]$ans -le $found.Count) { $pick = $found[[int]$ans - 1] }
 }
@@ -115,7 +136,13 @@ foreach ($v in $Variants) {
 
     $reportName = "ALBFX_$v"
     $ini = Join-Path $data ("albfx_tester_{0}.ini" -f $v)
-    $iniText = @(
+    $common = @()
+    if ($Login) {
+        $common += "[Common]"
+        $common += "Login=$Login"
+        if ($Server) { $common += "Server=$Server" }
+    }
+    $iniText = ($common + @(
         "[Tester]",
         "Expert=$EaName\$EaName.ex5",
         "ExpertParameters=$preset",
@@ -137,7 +164,7 @@ foreach ($v in $Variants) {
         "Report=$reportName",
         "ReplaceReport=1",
         "ShutdownTerminal=1"
-    ) -join "`r`n"
+    )) -join "`r`n"
     Set-Content -Path $ini -Value $iniText -Encoding ASCII
 
     # remove stale outputs so we never collect results from an older run
@@ -190,11 +217,38 @@ foreach ($v in $Variants) {
     $ok = ($html.Count -gt 0) -or ($ext.Count -gt 0)
     $state = if ($DryRun) { "DRY RUN" } elseif ($ok) { "OK" } else { "NO REPORT" }
     $summary += ("{0,-14} {1,-10} {2,6} min" -f $v, $state, $mins)
-    if ($ok) { Say ("  done in {0} min" -f $mins) "Green" }
-    elseif (-not $DryRun) {
-        Say "  no report produced. Most common cause: MT5 is not logged in with a saved password." "Yellow"
-        Say "  Open MT5, log in to your account (tick 'Save password'), close MT5 and run again." "Yellow"
+    if ($ok -or $DryRun) {
+        if ($ok) { Say ("  done in {0} min" -f $mins) "Green" }
+        continue
     }
+
+    # ---- failure: show MT5's own reason, offer one retry with an explicit account, else stop ----
+    $reason = Get-Mt5Reason $data $t0
+    if (-not $reason) { $reason = "no reason found in the MT5 log" }
+    $summary += ("    reason: {0}" -f $reason)
+    Say "  NO REPORT. MT5 says: $reason" "Yellow"
+    if (-not $Login -and $reason -match '(?i)account|authoriz|symbol') {
+        Say "  MT5 did not use your broker account. Type your account number to retry now" "Yellow"
+        Say "  (the password must be saved in MT5), or just press Enter to stop:" "Yellow"
+        $typed = (Read-Host "  Account number").Trim()
+        if ($typed) {
+            $Login = $typed
+            $srv = (Read-Host "  Server (Enter = LirunexLimited-Demo)").Trim()
+            $Server = if ($srv) { $srv } else { "LirunexLimited-Demo" }
+            $summary += ("    retry with Login={0} Server={1}" -f $Login, $Server)
+            $Variants = @($v) + @($Variants | Select-Object -Skip $n)
+            $n = 0
+            Say "  Retrying all remaining variants with account $Login on $Server ..." "Cyan"
+            # restart the loop over the remaining variants
+            & $PSCommandPath -Symbol $Symbol -From $From -To $To -Deposit $Deposit -Leverage $Leverage `
+                -Variants ($Variants -join ",") -AppData $AppData -OutRoot $OutRoot -Login $Login -Server $Server `
+                -Install ([array]::IndexOf($found, $pick) + 1)
+            exit $LASTEXITCODE
+        }
+    }
+    Say "  Stopping: the remaining variants would fail the same way." "Yellow"
+    Say "  Fix: open MT5, log in to your broker account with 'Save password' ticked, close MT5, run again." "Yellow"
+    break
 }
 
 # --- 7. zip -------------------------------------------------------------------

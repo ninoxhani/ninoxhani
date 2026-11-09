@@ -20,6 +20,10 @@ Added (tools, EA code unchanged)
   the EA and presets, runs variants A–D unattended (real ticks, M1, in-sample period) and zips every
   report/journal/log to the Desktop. Tested with PowerShell 7 dry run + simulated terminal; the generated
   `.ini` was parsed by real MT5 build 6308.
+- Runner self-diagnosis: after a failed run it prints the reason from the MT5 log, stops instead of
+  repeating the failure, and can retry with an explicit `Login`/`Server` (`[Common]` section). New
+  parameters `-Login`, `-Server`, `-Install`. Found in the first owner run: all variants ended in ~6 s
+  with no report.
 
 Changed (cosmetic)
 - Dashboard panel widened so the last line is no longer cut off.

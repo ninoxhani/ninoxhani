@@ -97,6 +97,8 @@ entries today, news-filter status, open position and the last evaluation result.
 3. Wait. It runs variants A, B, C and D one after another on `XAUUSD.std`, M1, real ticks,
    2026.04.01 → 2026.08.31, deposit 10 000 USD. The first run also downloads tick data.
    The PC must stay on.
+   If a run fails, the script prints MT5's own reason, stops, and (if MT5 did not use your broker
+   account) lets you type your account number to retry. Your password must be saved in MT5.
 4. At the end a single file `ALBFX_Backtests_<date>.zip` appears on your Desktop with every
    report, journal and log. Send that file for analysis.
 
