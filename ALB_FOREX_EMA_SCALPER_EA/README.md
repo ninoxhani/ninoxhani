@@ -9,7 +9,7 @@ MetaTrader 5:
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
 
 > **Status: NOT VALIDATED.** Compiles with 0 errors / 0 warnings (MetaEditor build 6308) and passes
-> its 72 logic self-tests, but no
+> its 74 logic self-tests, but no
 > backtest has been run yet and there is no evidence of a
 > positive edge. Do not trade real money with it. See [STATUS.md](STATUS.md).
 
@@ -29,7 +29,7 @@ Supply & Demand EA, Tradivo ProShi, EAGLE or any TradingView indicator.
 ```
 ALB_FOREX_EMA_SCALPER_EA/
 ├── ALB_FOREX_EMA_SCALPER_EA.mq5   EA source (single file, no external includes)
-├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled EA (MetaEditor build 6308)
+├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled EA v1.01 (MetaEditor build 6308)
 ├── presets/                       .set files for each research variant and test
 ├── tests/                         Strategy Tester .ini configs (command-line backtests)
 ├── reports/                       put tester reports here (empty until tests are run)
@@ -56,7 +56,7 @@ If the compiler reports anything, copy the full *Errors* tab text and send it ba
 
 Optional check: attach the EA with the `Test_SelfTests.set` preset (or set
 **Run built-in logic self-tests on start = true**). The *Experts* tab must show
-`[AFX-EMA][SELFTEST] 72 passed, 0 failed`.
+`[AFX-EMA][SELFTEST] 74 passed, 0 failed`.
 
 ## 3. Enable Algo Trading
 

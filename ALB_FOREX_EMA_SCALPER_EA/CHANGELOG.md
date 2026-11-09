@@ -1,5 +1,25 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
+## 1.01 — 2026-11-09 (defect fix)
+
+Compiled with MetaEditor build 6308: **0 errors, 0 warnings**. Self-tests: **74 passed, 0 failed**.
+
+Fixed
+- **Entry drift was biased against BUY trades.** v1.00 measured BUY drift on the Ask, so the spread
+  counted as "drift" for BUY only. On XAUUSD (spread ≈ 0.20 USD, ATR(M1) ≈ 1.0–1.4 USD) the spread
+  alone used up most of the 0.20 × ATR limit, rejecting almost every BUY. Found while reviewing the
+  first XAUUSD.std backtest (2026.10.01–10.05). Drift is now measured on the Bid for both directions
+  (price movement only); the spread has its own filter.
+
+Added
+- Input `InpDriftExcludesSpread` (default true). false = v1.00 behaviour, for comparison only.
+- Pure function `AfxDriftATR` + 2 self-tests (72 → 74).
+
+Changed (cosmetic)
+- Dashboard panel widened so the last line is no longer cut off.
+- Dashboard shows `+0.00%` instead of `-0.00%` when daily P/L is zero.
+- Presets regenerated (79 inputs).
+
 ## 1.00 — 2026-11-08 (initial implementation)
 
 Compiled with MetaEditor build 6308: **0 errors, 0 warnings** (`reports/compile/`).

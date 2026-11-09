@@ -17,13 +17,13 @@
 //+------------------------------------------------------------------+
 #property copyright   "ALB FOREX"
 #property link        "https://albforex.al"
-#property version     "1.00"
+#property version     "1.01"
 #property description "ALB FOREX EMA 8/14 Scalper - M5 trend, M1 EMA-band pullback entries."
 #property description "Structural swing SL, fixed R:R TP, equity-based sizing, daily loss guard."
 #property description "Experimental research EA - NOT validated for live trading."
 
 #define AFX_EA_NAME              "ALB_FOREX_EMA_SCALPER_EA"
-#define AFX_EA_VERSION           "1.00"
+#define AFX_EA_VERSION           "1.01"
 #define AFX_OBJ_PREFIX           "AFXES_"
 #define AFX_MAX_RISK_PERCENT     5.0
 #define AFX_MAX_DAILY_LOSS_PCT   20.0
@@ -134,7 +134,8 @@ input double                InpMaxSpreadToStopRatio     = 0.15;     // MaxSpread
 input int                   InpMaxSpreadPoints          = 0;        // MaxSpreadPoints (0 = disabled until calibrated)
 input int                   InpMaxQuoteAgeSeconds       = 15;       // Max quote age in seconds (0 = disabled)
 input bool                  InpEnableEntryDriftFilter   = true;     // EnableEntryDriftFilter
-input double                InpMaxEntryDriftATR         = 0.20;     // MaxEntryDriftATR (|exec quote - signal close| / entry-TF ATR)
+input double                InpMaxEntryDriftATR         = 0.20;     // MaxEntryDriftATR (|price - signal close| / entry-TF ATR)
+input bool                  InpDriftExcludesSpread      = true;     // Drift on Bid basis (price move only; spread has its own filter)
 input bool                  InpEnableNewsFilter         = true;     // EnableNewsFilter (fails CLOSED when data unavailable)
 input int                   InpNewsBlockBeforeMinutes   = 15;       // NewsBlockBeforeMinutes
 input int                   InpNewsBlockAfterMinutes    = 15;       // NewsBlockAfterMinutes
@@ -649,6 +650,14 @@ double AfxVolumeForRisk(const double budget, const double lossPerLot, const doub
    return v;
   }
 
+//--- distance between a price and the signal close in ATR units
+double AfxDriftATR(const double price, const double signalClose, const double atr)
+  {
+   if(atr <= 0.0)
+      return 0.0;
+   return MathAbs(price - signalClose) / atr;
+  }
+
 bool AfxSpreadOk(const double spreadPrice, const double slDistance, const double maxRatio)
   {
    if(slDistance <= 0.0)
@@ -892,6 +901,10 @@ int RunSelfTests()
 //--- spread / stop ratio
    ST(AfxSpreadOk(0.15, 1.00, 0.15), "spread 15 pts vs SL 100 pts ok");
    ST(!AfxSpreadOk(0.16, 1.00, 0.15), "spread 16 pts vs SL 100 pts rejected");
+
+//--- entry drift: Bid basis is spread-neutral; an Ask with 0.20 spread alone breaks a 0.20 ATR limit
+   ST(MathAbs(AfxDriftATR(2000.10, 2000.00, 1.0) - 0.10) < 1e-9, "drift 0.10 ATR on bid basis");
+   ST(AfxDriftATR(2000.00 + 0.21, 2000.00, 1.0) > 0.20, "spread-inclusive ask exceeds 0.20 ATR without any price move");
 
 //--- flat filter
    double sep = 0.0, slope = 0.0;
@@ -1935,11 +1948,14 @@ int BuildOrderLevels(AfxSignal &s)
          return Rej(s, RJ_SPREAD_TO_STOP, StringFormat("spread %.0f pts > %.2f x SL %.0f pts", s.spreadPts, InpMaxSpreadToStopRatio, s.slDist / g_point));
      }
 
-//--- entry drift versus the confirmed signal close
-   s.driftATR = (s.atrEntry > 0.0) ? MathAbs(s.entry - s.sigClose) / s.atrEntry : 0.0;
+//--- entry drift versus the confirmed signal close. Chart candles are Bid prices, so by
+//--- default drift is measured on the Bid for BOTH directions: it then measures price
+//--- movement only. Measuring a BUY on the Ask would add the spread to BUY drift only.
+   double driftPx = InpDriftExcludesSpread ? tk.bid : s.entry;
+   s.driftATR = AfxDriftATR(driftPx, s.sigClose, s.atrEntry);
    if(InpEnableEntryDriftFilter && s.driftATR > InpMaxEntryDriftATR)
-      return Rej(s, RJ_ENTRY_DRIFT, StringFormat("quote %s vs signal close %s = %.2f ATR > %.2f ATR",
-                 Px(s.entry), Px(s.sigClose), s.driftATR, InpMaxEntryDriftATR));
+      return Rej(s, RJ_ENTRY_DRIFT, StringFormat("%s %s vs signal close %s = %.2f ATR > %.2f ATR",
+                 InpDriftExcludesSpread ? "bid" : "quote", Px(driftPx), Px(s.sigClose), s.driftATR, InpMaxEntryDriftATR));
 
 //--- take profit (rounded away from entry so R:R is not reduced by normalisation)
    double tpRaw = AfxTakeProfit(s.dir, s.entry, s.sl, InpRewardRisk);
@@ -2672,7 +2688,7 @@ void DashboardUpdate(const bool force)
       ObjectSetInteger(0, bg, OBJPROP_CORNER, CORNER_LEFT_UPPER);
       ObjectSetInteger(0, bg, OBJPROP_XDISTANCE, 10);
       ObjectSetInteger(0, bg, OBJPROP_YDISTANCE, 22);
-      ObjectSetInteger(0, bg, OBJPROP_XSIZE, 470);
+      ObjectSetInteger(0, bg, OBJPROP_XSIZE, 540);
       ObjectSetInteger(0, bg, OBJPROP_YSIZE, 18 + lines * 17);
       ObjectSetInteger(0, bg, OBJPROP_BGCOLOR, C'8,12,30');
       ObjectSetInteger(0, bg, OBJPROP_BORDER_TYPE, BORDER_FLAT);
@@ -2706,7 +2722,10 @@ void DashboardUpdate(const bool force)
                              InpEnableFlatEMAFilter ? "ON" : "OFF", InpRewardRisk), cText);
    DashLabel(4, StringFormat("%s trend (closed bar): %s", EnumToString(InpTrendTF), DirName(g_lastTrendDir)),
              g_lastTrendDir > 0 ? cTitle : (g_lastTrendDir < 0 ? cAccent : cText));
-   DashLabel(5, StringFormat("Day P/L: %+.2f%%   Limit: -%.2f%%   %s", -g_day.lossPct, InpMaxDailyLossPercent,
+   double dayPct = -g_day.lossPct;
+   if(MathAbs(dayPct) < 0.005)
+      dayPct = 0.0;
+   DashLabel(5, StringFormat("Day P/L: %+.2f%%   Limit: -%.2f%%   %s", dayPct, InpMaxDailyLossPercent,
                              g_day.halted ? "HALTED" : "OK"), g_day.halted ? cBad : cGood);
    DashLabel(6, StringFormat("Entries today: %d / %d   Risk/trade: %.2f%%", used, InpMaxTradesPerDay, InpRiskPercent), cText);
    DashLabel(7, "News: " + (InpEnableNewsFilter ? g_newsStatus : "DISABLED"),

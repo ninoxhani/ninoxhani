@@ -1,4 +1,4 @@
-# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.00
+# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.01
 
 This document describes **exactly what the source code implements**. Where the master
 prompt left a choice open, the chosen default and the reason are recorded under
@@ -137,9 +137,14 @@ Spread is measured from the live quote (`Ask − Bid`), not `SYMBOL_SPREAD`.
   `MaxQuoteAgeSeconds` (15) → `QUOTE_STALE`.
 
 ### 7.3 Entry drift (`EnableEntryDriftFilter`, true)
-`|executable quote − signal close| / ATR_M1 ≤ MaxEntryDriftATR` (0.20).
-The executable quote is Ask for BUY and Bid for SELL, so for BUY the current spread is part of the
-measured drift. A late entry never widens the SL or increases risk; it is skipped.
+`|Bid − signal close| / ATR_M1 ≤ MaxEntryDriftATR` (0.20), for BUY and SELL.
+
+Chart candles are Bid prices, so measuring on the Bid gives the **price movement since the signal**
+for both directions. The spread is controlled separately by the spread filter (§7.2).
+`DriftExcludesSpread=false` restores the v1.00 behaviour (executable quote: Ask for BUY, Bid for SELL).
+That behaviour was a defect: on XAUUSD with a 0.20 USD spread and ATR(M1) ≈ 1.0–1.4 USD, the
+spread alone consumed most of the 0.20-ATR allowance, so BUYs were almost always rejected while
+SELLs were not. A late entry never widens the SL or increases risk; it is skipped.
 
 ### 7.4 News filter (`EnableNewsFilter`, true)
 - Live/demo: MT5 economic calendar (`CalendarValueHistory`, `CalendarEventById`), currencies
@@ -314,3 +319,4 @@ Demo and Strategy Tester accounts may run `FULL_AUTO` without `EnableLiveTrading
 | Mode B invalidation | touch candle closing through the far side of the band | "Discard invalidated setups" needed a concrete rule. |
 | Daily budget pre-check | ON (option) | Reduces overshoot of the daily limit by the next trade. |
 | Default `TradingMode` | FULL_AUTO with `EnableLiveTrading=false` | Backtests/demo trade normally; real money is locked until explicitly enabled. |
+| Drift price basis (v1.01) | Bid for both directions | The prompt said "executable quote"; taken literally it adds the spread to BUY drift only, a BUY/SELL bias found in the first XAUUSD test. The intent ("must not chase price") is price movement; spread has its own filter. Literal mode kept as an option. |

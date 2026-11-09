@@ -1,4 +1,4 @@
-# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.00
+# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.01
 
 Status of every item is tracked in [STATUS.md](STATUS.md). An item is **PASSED** only with
 evidence (compiler log, tester report, journal lines). Nothing below has been passed yet
@@ -9,7 +9,7 @@ unless STATUS.md says so.
 | ID | Test | Pass criterion | Evidence |
 |---|---|---|---|
 | T0.1 | Compile in MetaEditor (F7) | `0 errors, 0 warnings` | copy of the *Errors* tab |
-| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 72 passed, 0 failed` and EA starts | *Experts*/*Journal* line |
+| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 74 passed, 0 failed` and EA starts | *Experts*/*Journal* line |
 
 The self-tests cover: trend direction, band touch, Mode A BUY/SELL, Mode B touch/confirm/
 invalidation, entry-TF alignment, swing detection (strictness, right-bar confirmation,
@@ -28,6 +28,7 @@ Run in the Strategy Tester, XAUUSD M1, *Every tick based on real ticks*, a 1–2
 | T1.2 | Pattern rules | Same 20 signals: candle range intersects band, direction and close vs EMA8 correct | all match |
 | T1.3 | Structural SL | SL = last unbroken pivot low/high (2/2) ∓ buffer, on correct side | all match |
 | T1.4 | TP = 1.5R | `FILL VERIFIED` TP vs fill and SL | `|TP−fill| / |fill−SL|` = 1.50 ± 1 tick |
+| T1.4b | Drift symmetry | Journal: compare `ENTRY_DRIFT` counts for BUY vs SELL | no large BUY/SELL imbalance caused by spread |
 | T1.5 | Risk sizing | For each fill: `risk@SL + est. commission` ≤ 0.5 % equity (+ slippage) | no overshoot except logged slippage |
 | T1.6 | One position | Journal: never two open positions; `POSITION_ALREADY_OPEN` while one is open | holds |
 | T1.7 | Max 5 entries/day | Count fills per server day | ≤ 5 every day |

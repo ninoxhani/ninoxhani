@@ -1,4 +1,4 @@
-# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.00
+# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.01
 
 The MT5 inputs dialog shows the **label** (text after `//` in the source). Preset `.set` files
 and the tester `.ini` use the **variable name** (`Inp…`). Both are listed below.
@@ -50,7 +50,8 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | MaxSpreadPoints | `InpMaxSpreadPoints` | 0 | pts; 0 = disabled until calibrated for your broker |
 | Max quote age | `InpMaxQuoteAgeSeconds` | 15 | seconds; 0 = off |
 | EnableEntryDriftFilter | `InpEnableEntryDriftFilter` | true | |
-| MaxEntryDriftATR | `InpMaxEntryDriftATR` | 0.20 | `|exec quote − signal close|` / ATR(M1). BUY drift includes the spread. |
+| MaxEntryDriftATR | `InpMaxEntryDriftATR` | 0.20 | `|price − signal close|` / ATR(M1) |
+| Drift on Bid basis | `InpDriftExcludesSpread` | true | true = Bid for both directions (price move only). false = v1.00 behaviour (Ask for BUY, includes spread — biased against BUY). |
 | EnableNewsFilter | `InpEnableNewsFilter` | true | fails **closed**: no verified data = no new entries |
 | NewsBlockBeforeMinutes | `InpNewsBlockBeforeMinutes` | 15 | minutes |
 | NewsBlockAfterMinutes | `InpNewsBlockAfterMinutes` | 15 | minutes |
@@ -116,7 +117,7 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | Push notifications | `InpEnablePushNotifications` | false | live only; needs MetaQuotes ID in terminal settings |
 | Journal CSV | `InpWriteJournalCsv` | true | `Common\Files\ALBFX_EMA_SCALPER_Journal_<symbol>_<magic>_<TESTER|LIVE>.csv` |
 | Extended tester report | `InpWriteTesterReport` | true | `Common\Files\ALBFX_EMA_SCALPER_Report_<symbol>_<ModeA|ModeB>.txt` + journal log |
-| Run self-tests | `InpRunSelfTests` | false | runs 72 logic checks in `OnInit`; the EA refuses to start if any fail |
+| Run self-tests | `InpRunSelfTests` | false | runs 74 logic checks in `OnInit`; the EA refuses to start if any fail |
 
 ## Rejection codes (log, journal, report)
 
