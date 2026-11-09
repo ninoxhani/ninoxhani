@@ -20,6 +20,7 @@ ENUM_VALUES = {
     "AFX_FULL_AUTO": "0", "AFX_ALERT_ONLY": "1",
     "AFX_CONFIRM_SAME_CANDLE": "0", "AFX_CONFIRM_NEXT_CANDLE": "1",
     "AFX_NEWS_HIGH_ONLY": "0", "AFX_NEWS_MEDIUM_HIGH": "1",
+    "AFX_ENTRY_PULLBACK": "0", "AFX_ENTRY_CROSSOVER": "1",
     "PERIOD_M1": "1", "PERIOD_M5": "5", "PERIOD_M15": "15",
 }
 
@@ -53,6 +54,12 @@ BACKTEST = {
     "InpWriteTesterReport": "true",
 }
 
+SCALPER = {
+    "InpEntryMode": "1",
+    "InpMaxTradesPerDay": "0",
+    "InpRewardRisk": "1.0",
+}
+
 PRESETS = {
     "Backtest_A_Baseline": dict(BACKTEST),
     "Backtest_B_NextCandle": dict(BACKTEST, InpConfirmationMode="1"),
@@ -63,6 +70,11 @@ PRESETS = {
                                       InpCheckDailyBudgetBeforeEntry="false",
                                       InpEmergencyCloseOnDailyLimit="true"),
     "Test_SelfTests": dict(BACKTEST, InpRunSelfTests="true"),
+    # CROSSOVER scalper: every M1 EMA 8/14 cross, ATR stop 1.5, TP 1R, no daily trade cap
+    "Backtest_X_Crossover": dict(BACKTEST, **SCALPER),
+    "Backtest_X_CrossTrend": dict(BACKTEST, **SCALPER, InpCrossUseTrendFilter="true"),
+    "Demo_Scalper": dict({"InpTradingMode": "0", "InpEnableLiveTrading": "false",
+                          "InpEnableNewsFilter": "true"}, **SCALPER),
     "Demo_FullAuto": {"InpTradingMode": "0", "InpEnableLiveTrading": "false",
                       "InpEnableNewsFilter": "true"},
     "AlertOnly": {"InpTradingMode": "1", "InpEnableNewsFilter": "true"},

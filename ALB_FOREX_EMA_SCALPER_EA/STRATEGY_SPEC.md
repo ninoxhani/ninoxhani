@@ -1,4 +1,4 @@
-# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.01
+# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.10
 
 This document describes **exactly what the source code implements**. Where the master
 prompt left a choice open, the chosen default and the reason are recorded under
@@ -320,3 +320,28 @@ Demo and Strategy Tester accounts may run `FULL_AUTO` without `EnableLiveTrading
 | Daily budget pre-check | ON (option) | Reduces overshoot of the daily limit by the next trade. |
 | Default `TradingMode` | FULL_AUTO with `EnableLiveTrading=false` | Backtests/demo trade normally; real money is locked until explicitly enabled. |
 | Drift price basis (v1.01) | Bid for both directions | The prompt said "executable quote"; taken literally it adds the spread to BUY drift only, a BUY/SELL bias found in the first XAUUSD test. The intent ("must not chase price") is price movement; spread has its own filter. Literal mode kept as an option. |
+
+## 17. Entry mode CROSSOVER — scalper (v1.10, owner request 2026-11-09)
+
+`EntryMode = CROSSOVER`. A separate, experimental strategy inside the same EA. The PULLBACK
+baseline (§4–§9) is unchanged and remains the default (`EntryMode = PULLBACK`).
+
+The original prompt said not to use M1 EMA crossovers as standalone signals. The owner explicitly
+asked for this mode on 2026-11-09 ("enter every time the EMAs cross, not only 5 trades a day"),
+so it exists as an opt-in mode with its own presets and must be evaluated separately.
+
+| Item | Rule |
+|---|---|
+| Signal | Closed M1 bars: BUY when EMA8 ≤ EMA14 on shift 2 and EMA8 > EMA14 on shift 1; SELL mirrored. One signal per cross, evaluated once per new M1 bar. |
+| Trend filter | `CrossUseTrendFilter` (default **false** = every cross). When true, only crosses in the direction of the latest closed M5 EMA 8/14 trend (`CROSS_AGAINST_TREND` otherwise). |
+| Stop-loss | ATR stop: BUY SL = Bid − `CrossSLATR` × ATR(M1); SELL SL = Ask + `CrossSLATR` × ATR(M1) (default 1.5). Same spread cost for both sides. Min/max SL, spread, stops-level checks as in §8. |
+| Take-profit | `RewardRisk` × SL distance (scalper presets use **1.0R**). |
+| Opposite cross | `CrossCloseOnOpposite` (true): a cross the other way closes this EA's open position (`OPPOSITE CROSS`), even if the new entry is then rejected by a filter. A new entry in the new direction follows if all filters pass. |
+| Trades per day | `MaxTradesPerDay = 0` = unlimited (scalper presets). |
+| Unchanged protections | 0.5 % risk sizing, 2 % daily loss guard, spread/SL ratio, entry drift, news, sessions, one position per symbol, no martingale/grid. |
+
+Why SL 1.5 × ATR(M1): with ~0.20 USD spread and ATR(M1) ≈ 1.0–1.4 USD, a stop of 1 ATR fails the
+0.15 spread/SL rule; 1.5 ATR passes it. **All values are untested placeholders.**
+
+Risk note: M1 crossovers on XAUUSD whipsaw often and every trade pays the spread. Whether this
+mode has any edge is unknown until the CROSSOVER backtests (`Backtest_X_*`) are run.

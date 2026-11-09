@@ -17,13 +17,13 @@
 //+------------------------------------------------------------------+
 #property copyright   "ALB FOREX"
 #property link        "https://albforex.al"
-#property version     "1.01"
-#property description "ALB FOREX EMA 8/14 Scalper - M5 trend, M1 EMA-band pullback entries."
+#property version     "1.10"
+#property description "ALB FOREX EMA 8/14 Scalper - M1 EMA-band pullback entries or EMA crossover scalping."
 #property description "Structural swing SL, fixed R:R TP, equity-based sizing, daily loss guard."
 #property description "Experimental research EA - NOT validated for live trading."
 
 #define AFX_EA_NAME              "ALB_FOREX_EMA_SCALPER_EA"
-#define AFX_EA_VERSION           "1.01"
+#define AFX_EA_VERSION           "1.10"
 #define AFX_OBJ_PREFIX           "AFXES_"
 #define AFX_MAX_RISK_PERCENT     5.0
 #define AFX_MAX_DAILY_LOSS_PCT   20.0
@@ -43,6 +43,12 @@ enum ENUM_AFX_CONFIRM_MODE
   {
    AFX_CONFIRM_SAME_CANDLE = 0,   // A: SAME_CANDLE - one candle touches and confirms
    AFX_CONFIRM_NEXT_CANDLE = 1    // B: NEXT_CANDLE - touch, next candle confirms (experimental)
+  };
+
+enum ENUM_AFX_ENTRY_MODE
+  {
+   AFX_ENTRY_PULLBACK  = 0,   // PULLBACK - M5 trend + M1 EMA-band pullback (baseline)
+   AFX_ENTRY_CROSSOVER = 1    // CROSSOVER - every M1 EMA 8/14 cross (scalper)
   };
 
 enum ENUM_AFX_NEWS_LEVEL
@@ -97,6 +103,8 @@ enum ENUM_AFX_REJECT
    RJ_MARGIN,
    RJ_ORDER_CHECK,
    RJ_SEND_FAILED,
+   RJ_NO_CROSS,
+   RJ_TREND_MISMATCH,
    RJ_COUNT
   };
 
@@ -115,12 +123,16 @@ input int                   InpFastEMA            = 8;              // FastEMA (
 input int                   InpSlowEMA            = 14;             // SlowEMA (period)
 input ENUM_TIMEFRAMES       InpTrendTF            = PERIOD_M5;      // TrendTF
 input ENUM_TIMEFRAMES       InpEntryTF            = PERIOD_M1;      // EntryTF
-input ENUM_AFX_CONFIRM_MODE InpConfirmationMode   = AFX_CONFIRM_SAME_CANDLE; // ConfirmationMode
+input ENUM_AFX_ENTRY_MODE   InpEntryMode          = AFX_ENTRY_PULLBACK; // EntryMode (PULLBACK baseline / CROSSOVER scalper)
+input ENUM_AFX_CONFIRM_MODE InpConfirmationMode   = AFX_CONFIRM_SAME_CANDLE; // ConfirmationMode (PULLBACK only)
 input bool                  InpRequireM1EMAAlignment = false;       // RequireM1EMAAlignment (entry-TF EMA8 vs EMA14 in trade direction)
 input bool                  InpModeBInvalidateOnCloseThrough = true; // Mode B: discard touch candle that closes through the far side of the band
 input int                   InpATRPeriod          = 14;             // ATR period (entry TF and trend TF)
 input bool                  InpRejectAfterBarGap  = true;           // Reject signal candles that are not contiguous (market gap)
 input int                   InpMaxSignalDelaySeconds = 30;          // Max seconds after bar open to act on a closed-candle signal
+input bool                  InpCrossUseTrendFilter = false;         // CROSSOVER: only trade crosses in the M5 trend direction
+input double                InpCrossSLATR          = 1.5;           // CROSSOVER: stop distance (x entry-TF ATR) from the trigger price
+input bool                  InpCrossCloseOnOpposite = true;         // CROSSOVER: close an open position when the EMAs cross the other way
 
 input group "=== Market Filters ==="
 input bool                  InpEnableFlatEMAFilter      = false;    // EnableFlatEMAFilter (OFF = baseline; ON = research variant C)
@@ -172,7 +184,7 @@ input int                   InpMaxHoldMinutes     = 30;             // Time exit
 input group "=== Risk ==="
 input double                InpRiskPercent        = 0.5;            // RiskPercent (% of equity per trade)
 input double                InpMaxDailyLossPercent = 2.0;           // MaxDailyLossPercent (% of daily equity baseline)
-input int                   InpMaxTradesPerDay    = 5;              // MaxTradesPerDay (executed entries per broker day)
+input int                   InpMaxTradesPerDay    = 5;              // MaxTradesPerDay (executed entries per broker day, 0 = unlimited)
 input int                   InpMaxOpenPositions   = 1;              // MaxOpenPositions (all symbols, this magic number)
 input double                InpEstimatedCommissionPerLot = 7.0;     // EstimatedCommissionPerLot (round trip, account currency)
 input int                   InpEstimatedSlippagePoints   = 10;      // EstimatedSlippagePoints (per side, points)
@@ -450,13 +462,15 @@ string RejectName(const int code)
       case RJ_MARGIN:                   return "MARGIN";
       case RJ_ORDER_CHECK:              return "ORDER_CHECK_FAILED";
       case RJ_SEND_FAILED:              return "ORDER_SEND_FAILED";
+      case RJ_NO_CROSS:                 return "NO_EMA_CROSS";
+      case RJ_TREND_MISMATCH:           return "CROSS_AGAINST_TREND";
      }
    return "UNKNOWN";
   }
 
 bool IsNoSetup(const int code)
   {
-   return (code == RJ_NO_TREND || code == RJ_NO_TOUCH);
+   return (code == RJ_NO_TREND || code == RJ_NO_TOUCH || code == RJ_NO_CROSS);
   }
 
 int Rej(AfxSignal &s, const int code, const string detail)
@@ -475,6 +489,17 @@ int AfxTrendDir(const double emaFast, const double emaSlow)
    if(emaFast > emaSlow)
       return 1;
    if(emaFast < emaSlow)
+      return -1;
+   return 0;
+  }
+
+//--- EMA cross on closed bars: +1 fast crossed above slow on bar 1, -1 below, 0 none.
+//--- "Now" = latest closed bar (shift 1), "Prev" = the bar before it (shift 2).
+int AfxCrossDirection(const double fastNow, const double slowNow, const double fastPrev, const double slowPrev)
+  {
+   if(fastPrev <= slowPrev && fastNow > slowNow)
+      return 1;
+   if(fastPrev >= slowPrev && fastNow < slowNow)
       return -1;
    return 0;
   }
@@ -804,6 +829,14 @@ int RunSelfTests()
    ST(AfxTrendDir(2.0, 1.0) == 1, "trend up");
    ST(AfxTrendDir(1.0, 2.0) == -1, "trend down");
    ST(AfxTrendDir(1.0, 1.0) == 0, "trend equal -> none");
+
+//--- EMA crossover
+   ST(AfxCrossDirection(2001.0, 2000.0, 1999.0, 2000.0) == 1, "cross up");
+   ST(AfxCrossDirection(1999.0, 2000.0, 2001.0, 2000.0) == -1, "cross down");
+   ST(AfxCrossDirection(2001.0, 2000.0, 2002.0, 2000.0) == 0, "no cross while above");
+   ST(AfxCrossDirection(1999.0, 2000.0, 1998.0, 2000.0) == 0, "no cross while below");
+   ST(AfxCrossDirection(2001.0, 2000.0, 2000.0, 2000.0) == 1, "cross up from equal");
+   ST(AfxCrossDirection(2000.0, 2000.0, 1999.0, 2000.0) == 0, "touch to equal is not a cross yet");
 
 //--- band touch
    ST(AfxBandTouch(1998.8, 2001.0, 2000.0, 1999.0), "touch: wick through band");
@@ -1821,7 +1854,7 @@ int CheckGates(AfxSignal &s, const datetime now)
       return Rej(s, RJ_DAILY_LOSS_HALT, g_day.haltReason);
    RefreshHistoryAggregates(true);
    int used = g_execAllowed ? g_day.entries : g_day.alerts;
-   if(used >= InpMaxTradesPerDay)
+   if(InpMaxTradesPerDay > 0 && used >= InpMaxTradesPerDay)
       return Rej(s, RJ_MAX_TRADES_DAY, StringFormat("%d of %d used today", used, InpMaxTradesPerDay));
    if(g_pendVerify)
       return Rej(s, RJ_FILL_UNRECONCILED, StringFormat("order #%I64u still being reconciled", g_pendOrder));
@@ -1915,19 +1948,22 @@ int BuildOrderLevels(AfxSignal &s)
    s.spreadPts = spread / g_point;
    s.entry     = (s.dir > 0) ? tk.ask : tk.bid;
 
-//--- structural stop
-   double buffer = (double)InpStopBufferPoints * g_point + InpStopBufferATR * s.atrEntry;
-   double slRaw = 0.0;
+//--- stop: structural swing (PULLBACK) or ATR distance from the trigger price (CROSSOVER).
+//--- The ATR stop is measured from Bid for BUY (BUY SL triggers on Bid) and from Ask for SELL,
+//--- so BUY and SELL carry the same spread cost.
+   bool   atrStop = (InpEntryMode == AFX_ENTRY_CROSSOVER);
+   double buffer  = (double)InpStopBufferPoints * g_point + InpStopBufferATR * s.atrEntry;
+   double slRaw   = 0.0;
    if(s.dir > 0)
      {
-      slRaw = s.swingPrice - buffer;
+      slRaw = atrStop ? tk.bid - InpCrossSLATR * s.atrEntry : s.swingPrice - buffer;
       s.sl  = AfxRoundDown(slRaw, g_tick, g_digits);
       if(!(s.sl < tk.bid))
          return Rej(s, RJ_SL_WRONG_SIDE, StringFormat("BUY SL %s not below bid %s", Px(s.sl), Px(tk.bid)));
      }
    else
      {
-      slRaw = s.swingPrice + buffer + (InpAddSpreadToSellStop ? spread : 0.0);
+      slRaw = atrStop ? tk.ask + InpCrossSLATR * s.atrEntry : s.swingPrice + buffer + (InpAddSpreadToSellStop ? spread : 0.0);
       s.sl  = AfxRoundUp(slRaw, g_tick, g_digits);
       if(!(s.sl > tk.ask))
          return Rej(s, RJ_SL_WRONG_SIDE, StringFormat("SELL SL %s not above ask %s", Px(s.sl), Px(tk.ask)));
@@ -2056,12 +2092,11 @@ int BuildSignal(const datetime evalTime, AfxSignal &s)
    s.atrTrend     = at[0];
    s.sepATR       = MathAbs(tf[0] - ts[0]) / at[0];
    s.slopeATR     = (ts[0] - ts[nT - 1]) / at[0];
-   s.dir          = AfxTrendDir(tf[0], ts[0]);
-   g_lastTrendDir = s.dir;
-   if(s.dir == 0)
-      return Rej(s, RJ_NO_TREND, "trend TF EMA fast == EMA slow");
+   int trendDir   = AfxTrendDir(tf[0], ts[0]);
+   g_lastTrendDir = trendDir;
+   bool crossMode = (InpEntryMode == AFX_ENTRY_CROSSOVER);
 
-//--- candle pattern
+//--- candle arrays (index = shift)
    double o[], h[], l[], c[];
    ArrayResize(o, need);
    ArrayResize(h, need);
@@ -2074,6 +2109,26 @@ int BuildSignal(const datetime evalTime, AfxSignal &s)
       l[i] = r[i].low;
       c[i] = r[i].close;
      }
+   if(crossMode)
+     {
+      //--- CROSSOVER: every closed-bar EMA fast/slow cross on the entry TF is a signal
+      int cd = AfxCrossDirection(ef[1], es[1], ef[2], es[2]);
+      if(cd == 0)
+         return Rej(s, RJ_NO_CROSS, "no EMA cross on the last closed bar");
+      s.dir     = cd;
+      s.isSetup = true;
+      //--- exit rule: the opposite cross closes an open position, whatever the entry filters say
+      if(InpCrossCloseOnOpposite)
+         CloseOppositeOnCross(cd);
+      if(InpCrossUseTrendFilter && trendDir != cd)
+         return Rej(s, RJ_TREND_MISMATCH, StringFormat("%s cross but %s trend is %s", DirName(cd), EnumToString(InpTrendTF), DirName(trendDir)));
+      s.patternOk = true;
+     }
+   else
+     {
+   s.dir = trendDir;
+   if(s.dir == 0)
+      return Rej(s, RJ_NO_TREND, "trend TF EMA fast == EMA slow");
    int pr = AfxEvaluatePattern((int)InpConfirmationMode, s.dir, o, h, l, c, ef, es,
                                InpModeBInvalidateOnCloseThrough, InpRequireM1EMAAlignment);
    s.isSetup = (pr != RJ_NO_TOUCH);
@@ -2097,6 +2152,7 @@ int BuildSignal(const datetime evalTime, AfxSignal &s)
       return Rej(s, pr, d);
      }
    s.patternOk = true;
+     }
 
 //--- flat EMA filter (trend timeframe, ATR-normalised)
    if(InpEnableFlatEMAFilter)
@@ -2115,14 +2171,17 @@ int BuildSignal(const datetime evalTime, AfxSignal &s)
    if(gr != RJ_NONE)
       return gr;
 
-//--- structural swing
-   double sp = 0.0;
-   int sh = AfxFindSwing(h, l, need, s.dir > 0, InpSwingLeftBars, InpSwingRightBars,
-                         InpSwingLookback, InpSwingRequireUnbroken, sp);
-   if(sh < 0)
-      return Rej(s, RJ_NO_SWING, StringFormat("no confirmed %s in the last %d closed bars", s.dir > 0 ? "swing low" : "swing high", InpSwingLookback));
-   s.swingShift = sh;
-   s.swingPrice = sp;
+//--- structural swing (PULLBACK only; CROSSOVER uses an ATR stop)
+   if(!crossMode)
+     {
+      double sp = 0.0;
+      int sh = AfxFindSwing(h, l, need, s.dir > 0, InpSwingLeftBars, InpSwingRightBars,
+                            InpSwingLookback, InpSwingRequireUnbroken, sp);
+      if(sh < 0)
+         return Rej(s, RJ_NO_SWING, StringFormat("no confirmed %s in the last %d closed bars", s.dir > 0 ? "swing low" : "swing high", InpSwingLookback));
+      s.swingShift = sh;
+      s.swingPrice = sp;
+     }
 
    return BuildOrderLevels(s);
   }
@@ -2130,10 +2189,35 @@ int BuildSignal(const datetime evalTime, AfxSignal &s)
 //+------------------------------------------------------------------+
 //| Execution                                                        |
 //+------------------------------------------------------------------+
+//--- CROSSOVER exit rule: close this EA's position on this symbol that points against newDir.
+void CloseOppositeOnCross(const int newDir)
+  {
+   if(!g_execAllowed)
+      return;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+     {
+      ulong t = PositionGetTicket(i);
+      if(t == 0)
+         continue;
+      if((ulong)PositionGetInteger(POSITION_MAGIC) != InpMagicNumber || PositionGetString(POSITION_SYMBOL) != g_sym)
+         continue;
+      int pdir = ((ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY) ? 1 : -1;
+      if(pdir == -newDir)
+         ClosePositionByTicket(t, "OPPOSITE CROSS");
+     }
+  }
+
+string ModeTag()
+  {
+   if(InpEntryMode == AFX_ENTRY_CROSSOVER)
+      return "X";
+   return (InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE) ? "B" : "A";
+  }
+
 string BuildComment(const AfxSignal &s)
   {
    string c = StringFormat("%s %s %s", InpOrderComment, s.dir > 0 ? "B" : "S",
-                           InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "MB" : "MA");
+                           "M" + ModeTag());
    return StringSubstr(c, 0, 31);
   }
 
@@ -2574,7 +2658,7 @@ void EmitSignalAlert(AfxSignal &s)
    PersistState();
    string msg = StringFormat("%s %s %s signal [%s] entry~%s SL=%s TP=%s vol=%.2f risk=%.2f%s",
                              AFX_EA_NAME, g_sym, DirName(s.dir),
-                             InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "Mode B" : "Mode A",
+                             "Mode " + ModeTag(),
                              Px(s.entry), Px(s.sl), Px(s.tp), s.volume, s.plannedLoss,
                              (InpTradingMode == AFX_FULL_AUTO) ? " (LIVE EXECUTION LOCKED)" : "");
    if(InpEnableAlerts && !g_isOptim)
@@ -2633,7 +2717,7 @@ void JournalWrite(const AfxSignal &s)
    string line = StringFormat("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.3f,%.3f,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.1f,%s,%s,%s,%s,%.1f,%.3f,%.3f,%.2f,%.2f,%.2f\r\n",
                               TimeToString(s.evalTime, TIME_DATE | TIME_SECONDS),
                               TimeToString(s.signalBarTime, TIME_DATE | TIME_MINUTES),
-                              InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "B" : "A",
+                              ModeTag(),
                               DirName(s.dir), s.decision, RejectName(s.reject), CsvSafe(s.detail),
                               TimeToString(s.trendBarTime, TIME_DATE | TIME_MINUTES),
                               Px(s.emaFastTrend), Px(s.emaSlowTrend), s.sepATR, s.slopeATR,
@@ -2717,9 +2801,13 @@ void DashboardUpdate(const bool force)
              g_execAllowed ? cGood : cAccent);
    DashLabel(2, StringFormat("Symbol: %s   Spread: %.0f pts   Fill: %s   %s", g_sym, spreadPts, FillingName(g_filling),
                              g_isHedging ? "HEDGING" : "NETTING"), cText);
-   DashLabel(3, StringFormat("Confirm: %s   Flat filter: %s   RR 1:%.2f",
-                             InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "B next candle" : "A same candle",
-                             InpEnableFlatEMAFilter ? "ON" : "OFF", InpRewardRisk), cText);
+   if(InpEntryMode == AFX_ENTRY_CROSSOVER)
+      DashLabel(3, StringFormat("Entry: CROSSOVER  trend filter %s  SL %.1f ATR  RR 1:%.2f",
+                                InpCrossUseTrendFilter ? "ON" : "OFF", InpCrossSLATR, InpRewardRisk), cText);
+   else
+      DashLabel(3, StringFormat("Confirm: %s   Flat filter: %s   RR 1:%.2f",
+                                InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "B next candle" : "A same candle",
+                                InpEnableFlatEMAFilter ? "ON" : "OFF", InpRewardRisk), cText);
    DashLabel(4, StringFormat("%s trend (closed bar): %s", EnumToString(InpTrendTF), DirName(g_lastTrendDir)),
              g_lastTrendDir > 0 ? cTitle : (g_lastTrendDir < 0 ? cAccent : cText));
    double dayPct = -g_day.lossPct;
@@ -2727,7 +2815,8 @@ void DashboardUpdate(const bool force)
       dayPct = 0.0;
    DashLabel(5, StringFormat("Day P/L: %+.2f%%   Limit: -%.2f%%   %s", dayPct, InpMaxDailyLossPercent,
                              g_day.halted ? "HALTED" : "OK"), g_day.halted ? cBad : cGood);
-   DashLabel(6, StringFormat("Entries today: %d / %d   Risk/trade: %.2f%%", used, InpMaxTradesPerDay, InpRiskPercent), cText);
+   DashLabel(6, StringFormat("Entries today: %d / %s   Risk/trade: %.2f%%", used,
+                             InpMaxTradesPerDay > 0 ? IntegerToString(InpMaxTradesPerDay) : "unlimited", InpRiskPercent), cText);
    DashLabel(7, "News: " + (InpEnableNewsFilter ? g_newsStatus : "DISABLED"),
              (!InpEnableNewsFilter || g_newsOk) ? cText : cBad);
    DashLabel(8, "Position: " + pos, cText);
@@ -2768,7 +2857,7 @@ void FinalizeEvaluation(AfxSignal &s)
    if(s.patternOk && s.reject != RJ_NONE)
       g_rejectedSignals++;
 
-   string modeTxt = (InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE) ? "B" : "A";
+   string modeTxt = ModeTag();
    if(s.reject == RJ_NONE || s.decision == "ORDER_OUTCOME_UNKNOWN")
       g_lastEvalText = StringFormat("%s %s %s %s SL %s TP %s vol %.2f", TimeToString(s.signalBarTime, TIME_MINUTES),
                                     DirName(s.dir), s.decision, Px(s.entry), Px(s.sl), Px(s.tp), s.volume);
@@ -2840,6 +2929,9 @@ double BuildPerformanceReport(string &out)
    out = "";
    AddLine(out, "==================== ALB FOREX EMA 8/14 SCALPER - EXTENDED REPORT ====================");
    AddLine(out, StringFormat("EA %s v%s | symbol %s | magic %I64u", AFX_EA_NAME, AFX_EA_VERSION, g_sym, InpMagicNumber));
+   AddLine(out, StringFormat("Config: ENTRY MODE=%s%s", InpEntryMode == AFX_ENTRY_CROSSOVER ? "CROSSOVER (every M1 EMA cross)" : "PULLBACK (baseline)",
+                             InpEntryMode == AFX_ENTRY_CROSSOVER ? StringFormat(" trendFilter=%s SL=%.2fATR closeOnOpposite=%s",
+                                   BoolStr(InpCrossUseTrendFilter), InpCrossSLATR, BoolStr(InpCrossCloseOnOpposite)) : ""));
    AddLine(out, StringFormat("Config: mode=%s confirm=%s flatFilter=%s(sep=%s %.2f, slope=%s %.2f/%d bars) M1align=%s",
                              InpTradingMode == AFX_FULL_AUTO ? "FULL_AUTO" : "ALERT_ONLY",
                              InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "B_NEXT_CANDLE" : "A_SAME_CANDLE",
@@ -3050,8 +3142,10 @@ bool ValidateInputs(string &why)
      { why = StringFormat("RiskPercent must be in (0, %.1f]", AFX_MAX_RISK_PERCENT); return false; }
    if(InpMaxDailyLossPercent <= 0.0 || InpMaxDailyLossPercent > AFX_MAX_DAILY_LOSS_PCT)
      { why = StringFormat("MaxDailyLossPercent must be in (0, %.1f]", AFX_MAX_DAILY_LOSS_PCT); return false; }
-   if(InpMaxTradesPerDay < 1 || InpMaxOpenPositions < 1)
-     { why = "MaxTradesPerDay and MaxOpenPositions must be >= 1"; return false; }
+   if(InpMaxTradesPerDay < 0 || InpMaxOpenPositions < 1)
+     { why = "MaxTradesPerDay must be >= 0 (0 = unlimited) and MaxOpenPositions >= 1"; return false; }
+   if(InpCrossSLATR <= 0.0)
+     { why = "CROSSOVER stop distance must be > 0"; return false; }
    if(InpMaxSpreadToStopRatio < 0.0 || InpMaxSpreadPoints < 0 || InpMaxEntryDriftATR < 0.0 || InpMaxQuoteAgeSeconds < 0)
      { why = "spread / drift / quote-age thresholds cannot be negative"; return false; }
    if(InpStopBufferPoints < 0 || InpStopBufferATR < 0.0 || InpMinStopATR < 0.0 || InpMinStopPoints < 0 || InpMaxStopATR < 0.0)
@@ -3187,9 +3281,13 @@ int OnInit()
                AFX_EA_NAME, AFX_EA_VERSION, g_sym, InpTradingMode == AFX_FULL_AUTO ? "FULL_AUTO" : "ALERT_ONLY",
                g_execStatus, InpMagicNumber, FillingName(g_filling), DoubleToString(g_point, g_digits),
                DoubleToString(g_tick, g_digits), g_volMin, g_volMax, g_volStep);
-   PrintFormat("[AFX-EMA] Strategy: trend %s EMA%d/%d (closed bar), entry %s, confirmation %s, flat filter %s, account %s, news %s",
+   PrintFormat("[AFX-EMA] Strategy: trend %s EMA%d/%d (closed bar), entry %s, %s, flat filter %s, account %s, news %s",
                EnumToString(InpTrendTF), InpFastEMA, InpSlowEMA, EnumToString(InpEntryTF),
-               InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "B (next candle, experimental)" : "A (same candle)",
+               InpEntryMode == AFX_ENTRY_CROSSOVER
+               ? StringFormat("entry mode CROSSOVER (trend filter %s, SL %.2f ATR, RR %.2f, max trades/day %s)",
+                              InpCrossUseTrendFilter ? "ON" : "OFF", InpCrossSLATR, InpRewardRisk,
+                              InpMaxTradesPerDay > 0 ? IntegerToString(InpMaxTradesPerDay) : "unlimited")
+               : (InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "confirmation B (next candle, experimental)" : "confirmation A (same candle)"),
                InpEnableFlatEMAFilter ? "ON" : "OFF", g_isHedging ? "HEDGING" : "NETTING",
                InpEnableNewsFilter ? g_newsStatus : "DISABLED");
    g_initOk = true;
@@ -3328,7 +3426,7 @@ double OnTester()
             Print(ln);
         }
       string fn = StringFormat("ALBFX_EMA_SCALPER_Report_%s_%s.txt", FileSafe(g_sym),
-                               InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "ModeB" : "ModeA");
+                               "Mode" + ModeTag());
       int h = FileOpen(fn, FILE_WRITE | FILE_TXT | FILE_ANSI | FILE_COMMON);
       if(h != INVALID_HANDLE)
         {

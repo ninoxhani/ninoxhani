@@ -1,4 +1,4 @@
-# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.01
+# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.10
 
 Status of every item is tracked in [STATUS.md](STATUS.md). An item is **PASSED** only with
 evidence (compiler log, tester report, journal lines). Nothing below has been passed yet
@@ -9,7 +9,7 @@ unless STATUS.md says so.
 | ID | Test | Pass criterion | Evidence |
 |---|---|---|---|
 | T0.1 | Compile in MetaEditor (F7) | `0 errors, 0 warnings` | copy of the *Errors* tab |
-| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 74 passed, 0 failed` and EA starts | *Experts*/*Journal* line |
+| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 80 passed, 0 failed` and EA starts | *Experts*/*Journal* line |
 
 The self-tests cover: trend direction, band touch, Mode A BUY/SELL, Mode B touch/confirm/
 invalidation, entry-TF alignment, swing detection (strictness, right-bar confirmation,
@@ -89,6 +89,8 @@ period (trend, range, high/low volatility) from the monthly table.
 | B | `Backtest_B_NextCandle.set` | Mode B |
 | C | `Backtest_C_FlatFilter.set` | + flat-EMA filter (placeholder thresholds) |
 | D | `Backtest_D_BreakEven.set` | + break-even at 1R |
+| X | `Backtest_X_Crossover.set` | **different strategy**: CROSSOVER scalper, every M1 cross, SL 1.5 ATR, TP 1R, unlimited trades |
+| X-T | `Backtest_X_CrossTrend.set` | X + only crosses in the M5 trend direction |
 
 **Metrics (extended report + MT5 report):** total trades, win rate, net profit, profit factor,
 max equity drawdown, average win, average loss, average realised R, expectancy, average and

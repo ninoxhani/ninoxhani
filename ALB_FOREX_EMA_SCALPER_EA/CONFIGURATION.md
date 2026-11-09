@@ -1,4 +1,4 @@
-# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.01
+# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.10
 
 The MT5 inputs dialog shows the **label** (text after `//` in the source). Preset `.set` files
 and the tester `.ini` use the **variable name** (`Inp…`). Both are listed below.
@@ -28,12 +28,16 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | SlowEMA | `InpSlowEMA` | 14 | period, must be > FastEMA |
 | TrendTF | `InpTrendTF` | M5 | must be higher than EntryTF |
 | EntryTF | `InpEntryTF` | M1 | |
-| ConfirmationMode | `InpConfirmationMode` | SAME_CANDLE (0) | 0 = Mode A, 1 = Mode B (experimental). Never mix in one run. |
+| EntryMode | `InpEntryMode` | PULLBACK (0) | 0 = PULLBACK baseline, 1 = CROSSOVER scalper (every M1 EMA cross, STRATEGY_SPEC §17) |
+| ConfirmationMode | `InpConfirmationMode` | SAME_CANDLE (0) | PULLBACK only: 0 = Mode A, 1 = Mode B (experimental). Never mix in one run. |
 | RequireM1EMAAlignment | `InpRequireM1EMAAlignment` | false | entry-TF EMA8 above/below EMA14 in trade direction |
 | Mode B close-through invalidation | `InpModeBInvalidateOnCloseThrough` | true | Mode B only |
 | ATR period | `InpATRPeriod` | 14 | used on both timeframes |
 | Reject after bar gap | `InpRejectAfterBarGap` | true | signal candle must be adjacent to the current bar |
 | Max signal delay | `InpMaxSignalDelaySeconds` | 30 | seconds after the new bar opens |
+| CROSSOVER trend filter | `InpCrossUseTrendFilter` | false | true = only crosses in the M5 trend direction |
+| CROSSOVER stop | `InpCrossSLATR` | 1.5 | × ATR(M1) from Bid (BUY) / Ask (SELL) — *placeholder* |
+| CROSSOVER close on opposite | `InpCrossCloseOnOpposite` | true | an opposite cross closes the open EA position |
 
 ## Market filters
 
@@ -94,7 +98,7 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 |---|---|---|---|
 | RiskPercent | `InpRiskPercent` | 0.5 | % of current equity per trade. Hard limit 5.0. |
 | MaxDailyLossPercent | `InpMaxDailyLossPercent` | 2.0 | % of the daily equity baseline. Hard limit 20.0. |
-| MaxTradesPerDay | `InpMaxTradesPerDay` | 5 | executed entries per broker day (alerts in ALERT_ONLY) |
+| MaxTradesPerDay | `InpMaxTradesPerDay` | 5 | executed entries per broker day (alerts in ALERT_ONLY); **0 = unlimited** |
 | MaxOpenPositions | `InpMaxOpenPositions` | 1 | across all symbols for this magic; one per symbol is always enforced |
 | EstimatedCommissionPerLot | `InpEstimatedCommissionPerLot` | 7.0 | account currency per 1.0 lot, **round trip**. Set to your broker's value. |
 | EstimatedSlippagePoints | `InpEstimatedSlippagePoints` | 10 | pts per side, added to the risk budget |
@@ -117,7 +121,7 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | Push notifications | `InpEnablePushNotifications` | false | live only; needs MetaQuotes ID in terminal settings |
 | Journal CSV | `InpWriteJournalCsv` | true | `Common\Files\ALBFX_EMA_SCALPER_Journal_<symbol>_<magic>_<TESTER|LIVE>.csv` |
 | Extended tester report | `InpWriteTesterReport` | true | `Common\Files\ALBFX_EMA_SCALPER_Report_<symbol>_<ModeA|ModeB>.txt` + journal log |
-| Run self-tests | `InpRunSelfTests` | false | runs 74 logic checks in `OnInit`; the EA refuses to start if any fail |
+| Run self-tests | `InpRunSelfTests` | false | runs 80 logic checks in `OnInit`; the EA refuses to start if any fail |
 
 ## Rejection codes (log, journal, report)
 
@@ -126,7 +130,8 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | `DATA_NOT_READY` | history, indicator or copy failure after retries |
 | `TREND_TF_NOT_SYNCED` | M5 series not rolled forward yet |
 | `STALE_SIGNAL` | evaluation too late after bar open, or market gap |
-| `NO_TREND` / `NO_BAND_TOUCH` | no setup (not logged unless `InpLogNoSetupBars`) |
+| `NO_TREND` / `NO_BAND_TOUCH` / `NO_EMA_CROSS` | no setup (not logged unless `InpLogNoSetupBars`) |
+| `CROSS_AGAINST_TREND` | CROSSOVER with trend filter: cross against the M5 trend |
 | `CANDLE_DIRECTION` / `CLOSE_VS_EMA8` / `SETUP_INVALIDATED` / `ENTRY_TF_EMA_ALIGNMENT` | touch occurred, confirmation failed |
 | `FLAT_EMA_SEPARATION` / `FLAT_EMA_SLOPE` | flat-EMA filter |
 | `SESSION_FILTER` / `MARKET_CLOSED` / `DIRECTION_NOT_ALLOWED` | time / symbol trade mode |
@@ -151,6 +156,9 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | `Backtest_A_NewsCSV.set` | A with news filter ON using the exported CSV |
 | `Test_DailyLimit_Emergency.set` | forces daily-limit activation and emergency close (functional test only) |
 | `Test_SelfTests.set` | runs the built-in self-tests |
+| `Backtest_X_Crossover.set` | CROSSOVER scalper: every M1 cross, SL 1.5 ATR, TP 1R, unlimited trades, news OFF |
+| `Backtest_X_CrossTrend.set` | same, only crosses in the M5 trend direction |
+| `Demo_Scalper.set` | CROSSOVER scalper for a demo account, news ON |
 | `Demo_FullAuto.set` | demo account forward test, news ON |
 | `AlertOnly.set` | signals only |
 

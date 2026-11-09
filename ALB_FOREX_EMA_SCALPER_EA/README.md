@@ -7,9 +7,11 @@ MetaTrader 5:
 - **Entry:** a closed M1 candle touches the EMA 8/14 band and confirms in the trend direction.
 - **Exit:** structural swing stop-loss and a fixed **1.5R** take-profit.
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
+- **v1.10 scalper mode (`EntryMode = CROSSOVER`):** enters on every M1 EMA 8/14 cross, ATR stop,
+  1R target, opposite cross closes the trade, no daily trade cap. Presets `Backtest_X_*`, `Demo_Scalper`.
 
 > **Status: NOT VALIDATED.** Compiles with 0 errors / 0 warnings (MetaEditor build 6308) and passes
-> its 74 logic self-tests, but no
+> its 80 logic self-tests, but no
 > backtest has been run yet and there is no evidence of a
 > positive edge. Do not trade real money with it. See [STATUS.md](STATUS.md).
 
@@ -29,7 +31,7 @@ Supply & Demand EA, Tradivo ProShi, EAGLE or any TradingView indicator.
 ```
 ALB_FOREX_EMA_SCALPER_EA/
 ├── ALB_FOREX_EMA_SCALPER_EA.mq5   EA source (single file, no external includes)
-├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled EA v1.01 (MetaEditor build 6308)
+├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled EA v1.10 (MetaEditor build 6308)
 ├── presets/                       .set files for each research variant and test
 ├── tests/                         Strategy Tester .ini configs (command-line backtests)
 ├── reports/                       put tester reports here (empty until tests are run)
@@ -94,7 +96,7 @@ entries today, news-filter status, open position and the last evaluation result.
 1. Log in to your broker account in MT5 once with **Save password** ticked, then **close MT5**.
 2. Double-click **`RUN_BACKTESTS.bat`** in this folder. (If Windows SmartScreen warns:
    *More info → Run anyway*.)
-3. Wait. It runs variants A, B, C and D one after another on `XAUUSD.std`, M1, real ticks,
+3. Wait. It runs X_Crossover (scalper), X_CrossTrend and A_Baseline one after another on `XAUUSD.std`, M1, real ticks,
    2026.04.01 → 2026.08.31, deposit 10 000 USD. The first run also downloads tick data.
    The PC must stay on.
    If a run fails, the script prints MT5's own reason, stops, and (if MT5 did not use your broker

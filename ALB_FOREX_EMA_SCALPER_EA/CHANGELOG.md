@@ -1,5 +1,20 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
+## 1.10 — 2026-11-09 (new entry mode: CROSSOVER scalper)
+
+Compiled with MetaEditor build 6308: **0 errors, 0 warnings**. Self-tests: **80 passed, 0 failed**
+(run in CROSSOVER mode). PULLBACK baseline behaviour unchanged.
+
+Added (owner request)
+- `InpEntryMode = CROSSOVER`: enter on every closed-bar M1 EMA 8/14 cross; ATR stop
+  (`InpCrossSLATR` = 1.5); TP = `RewardRisk` × stop; opposite cross closes the open position
+  (`InpCrossCloseOnOpposite`); optional M5 trend filter (`InpCrossUseTrendFilter`, off).
+- `InpMaxTradesPerDay = 0` means unlimited.
+- Rejection codes `NO_EMA_CROSS`, `CROSS_AGAINST_TREND`; mode tag `X` in journal, comments, report.
+- Presets `Backtest_X_Crossover`, `Backtest_X_CrossTrend`, `Demo_Scalper` (RR 1.0, unlimited trades).
+- `AfxCrossDirection` pure function + 6 self-tests.
+- One-click runner now tests X_Crossover, X_CrossTrend and A_Baseline by default.
+
 ## 1.01 — 2026-11-09 (defect fix)
 
 Compiled with MetaEditor build 6308: **0 errors, 0 warnings**. Self-tests: **74 passed, 0 failed**.

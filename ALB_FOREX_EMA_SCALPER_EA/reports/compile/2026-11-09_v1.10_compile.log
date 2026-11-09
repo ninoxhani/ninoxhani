@@ -1,0 +1,9 @@
+# MetaEditor compile log - ALB_FOREX_EMA_SCALPER_EA v1.10
+# Date: 2026-11-09 | MetaEditor64.exe FileVersion 5.0.0.6308 | WineHQ 11.0 on Ubuntu 24.04 (cloud sandbox)
+# Source SHA-256: beb278e2f72110a9e925d2eb72291b1b64ab4b6c79c833a816a68659a1aa808a
+# EX5    SHA-256: f103dfc645dd421e6fd5116292edcec6b59fbac37d829904b72de3deabb337e3
+
+ALB_FOREX_EMA_SCALPER_EA.mq5 : information: compiling ALB_FOREX_EMA_SCALPER_EA.mq5
+ : information: generating code
+ : information: code generated
+Result: 0 errors, 0 warnings, 2929 ms elapsed, cpu='X64 Regular'

@@ -1,0 +1,12 @@
+# MT5 Experts log - ALB_FOREX_EMA_SCALPER_EA v1.10 self-test run
+# 2026-11-09 | MetaTrader 5 x64 build 6308 on Wine 11.0 (cloud sandbox) | offline terminal, no broker account
+# EURUSD M1 sample chart, Test_SelfTests.set with InpEntryMode=1 (CROSSOVER) and InpMaxTradesPerDay=0
+# Purpose: T0.2 self-tests + clean init/deinit in CROSSOVER mode. Not a trading test.
+
+21:01:13.662	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA][SELFTEST] 80 passed, 0 failed
+21:01:13.662	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA][WARN] This EA is designed and documented for XAUUSD. EURUSD is untested.
+21:01:13.797	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] Daily baseline: 0.00 (SNAPSHOT_AT_START) day start 2026.11.09 00:00, entries today 0, halted false
+21:01:13.798	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] Journal: Common\Files\ALBFX_EMA_SCALPER_Journal_EURUSD_81420261_LIVE.csv
+21:01:13.798	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] ALB_FOREX_EMA_SCALPER_EA v1.10 started on EURUSD | FULL_AUTO | executing (demo) | magic 81420261 | filling FOK | point 0.00001 tick 0.00001 | lots 0.01-500.00 step 0.01
+21:01:13.798	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] Strategy: trend PERIOD_M5 EMA8/14 (closed bar), entry PERIOD_M1, entry mode CROSSOVER (trend filter OFF, SL 1.50 ATR, RR 1.50, max trades/day unlimited), flat filter OFF, account NETTING, news DISABLED
+21:01:42.523	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] Stopped (reason 9). Session: evaluated 0, setups 0, patterns 0, valid 0, orders 0, fills 0, alerts 0, daily-limit hits 0

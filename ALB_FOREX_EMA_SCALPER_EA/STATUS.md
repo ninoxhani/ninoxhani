@@ -1,6 +1,6 @@
 # STATUS — ALB_FOREX_EMA_SCALPER_EA
 
-**Version:** 1.01 · **Updated:** 2026-11-09 · **Readiness: INCOMPLETE**
+**Version:** 1.10 · **Updated:** 2026-11-09 · **Readiness: INCOMPLETE**
 
 > Read this file first when resuming work. It separates what is implemented, what is verified
 > with evidence, and what is still open. Never upgrade a status without evidence in `reports/`.
@@ -10,15 +10,18 @@
 | Gate | Status |
 |---|---|
 | Source implemented | ✅ done |
-| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.01) — MetaEditor build 6308, `reports/compile/2026-11-09_v1.01_compile.log` |
-| Self-tests pass (74 checks) | ✅ **VERIFIED** (v1.01) — 74 passed, 0 failed in MT5 build 6308, `reports/selftest/2026-11-09_v1.01_selftest_experts.log` |
+| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.10) — MetaEditor build 6308, `reports/compile/2026-11-09_v1.10_compile.log` |
+| Self-tests pass (80 checks) | ✅ **VERIFIED** (v1.10) — 80 passed, 0 failed in MT5 build 6308, `reports/selftest/2026-11-09_v1.10_selftest_experts.log` |
 | Functional backtests T1 | ⬜ not completed — first owner run (Lirunex demo, XAUUSD.std M1, 2026.10.01–10.05, v1.00) showed the BUY drift defect fixed in v1.01; rerun with v1.01 |
 | Edge cases T2 | ⬜ not run |
 | Research backtests T3 (in/out-of-sample) | ⬜ not run — **no performance data exists** |
 | Demo forward test T4 | ⬜ not run |
 | **Overall** | **INCOMPLETE** — compiles and pure logic is self-tested, but no trading test yet; not DEMO READY until T1 passes; not a LIVE CANDIDATE |
 
-## Completed implementation (v1.00 + v1.01 fix)
+## Completed implementation (v1.00 + v1.01 fix + v1.10 CROSSOVER mode)
+
+- **v1.10:** CROSSOVER scalper entry mode (every M1 EMA 8/14 cross, ATR stop, TP 1R in presets,
+  opposite-cross exit, optional M5 trend filter, unlimited trades/day). See STRATEGY_SPEC §17.
 
 All items of the master prompt Phases 1–6 are implemented in `ALB_FOREX_EMA_SCALPER_EA.mq5`:
 
@@ -65,7 +68,10 @@ functions only; the terminal-dependent code (orders, history, calendar) has not 
 - Compiler: MetaEditor64.exe FileVersion **5.0.0.6308** (official MetaQuotes installer, signed by
   MetaQuotes Ltd, installer SHA-256 `a879492d…4c93`), run under WineHQ 11.0 in a Linux cloud sandbox
   with the owner's approval. Ubuntu's Wine 9.0 could not run MetaEditor (false "debugger detected").
-- v1.01 (current): `Result: 0 errors, 0 warnings, 3020 ms elapsed`; source SHA-256
+- v1.10 (current): `Result: 0 errors, 0 warnings, 2929 ms elapsed`; source SHA-256
+  `beb278e2f72110a9e925d2eb72291b1b64ab4b6c79c833a816a68659a1aa808a`; `.ex5` SHA-256
+  `f103dfc645dd421e6fd5116292edcec6b59fbac37d829904b72de3deabb337e3`; log `reports/compile/2026-11-09_v1.10_compile.log`
+- v1.01: `Result: 0 errors, 0 warnings, 3020 ms elapsed`; source SHA-256
   `6871315a2c70e03b77fb964a3819c0a5ee9531bba0b746652bde0d835481e4c1`; `.ex5` SHA-256
   `c05b0f258af414de7db063ce4689a757ddb58005ba375b357a05c864a4263ecc`; log `reports/compile/2026-11-09_v1.01_compile.log`
 - v1.00: `Result: 0 errors, 0 warnings`; log `reports/compile/2026-11-08_v1.00_compile.log`
@@ -74,7 +80,9 @@ functions only; the terminal-dependent code (orders, history, calendar) has not 
 ## Test results
 
 - **T0.1 compile:** PASSED (0 errors, 0 warnings) — v1.00 and v1.01.
-- **T0.2 self-tests:** PASSED — v1.00 72/72, v1.01 74/74 — MT5 build 6308, 2026-11-09.
+- **T0.2 self-tests:** PASSED — v1.00 72/72, v1.01 74/74, v1.10 80/80 — MT5 build 6308, 2026-11-09.
+- **Owner one-click run #1 (v1.01, 2026-11-09 16:11):** all 4 variants `NO REPORT` after ~6 s — MT5 did not start
+  the tester; no reason captured. Runner improved to report MT5's reason and retry with the account.
 - **Owner demo run (v1.00, Lirunex XAUUSD.std):** EA live, news calendar verified, evaluations logged.
 - **Owner tester run (v1.00, XAUUSD.std M1, 2026.10.01–10.05, visual):** no trades visible in the shown window.
   Review found a defect: BUY drift was measured on the Ask, so the ~0.20 USD spread alone used up
@@ -109,8 +117,8 @@ functions only; the terminal-dependent code (orders, history, calendar) has not 
 
 1. ~~Compile~~ — done (0 errors, 0 warnings).
 2. ~~Self-tests~~ — done (v1.01: 74/74).
-3. **Owner action:** double-click `RUN_BACKTESTS.bat` (runs A–D in-sample 2026.04.01–08.31 on XAUUSD.std and
-   zips all results to the Desktop), then send the zip. Script dry-run and full simulation tested; the generated
+3. **Owner action:** log in to MT5 (Lirunex demo, Save password), close MT5, double-click `RUN_BACKTESTS.bat`
+   (default: X_Crossover, X_CrossTrend, A_Baseline; in-sample 2026.04.01–08.31 on XAUUSD.std), send the zip. Script dry-run and full simulation tested; the generated
    tester `.ini` was accepted by real MT5 build 6308. Equivalent manual route: run TEST_PLAN **T1** functional checks on 1–2 weeks of real-tick data, especially T1.1 (look-ahead),
    T1.4 (TP), T1.5 (sizing), T1.11 (daily limit + emergency close).
 4. Only then run **T3** variants A–D with identical dates and an untouched out-of-sample period,

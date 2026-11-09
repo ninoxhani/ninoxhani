@@ -4,7 +4,9 @@
   What it does (no MT5 clicks needed):
     1. Finds your MetaTrader 5 installation and data folder.
     2. Copies the EA (.ex5/.mq5) and the presets into MT5.
-    3. Runs the Strategy Tester once per variant (A, B, C, D), unattended.
+    3. Runs the Strategy Tester once per variant, unattended. Default: X_Crossover (scalper, every
+       M1 EMA cross), X_CrossTrend (same, only with the M5 trend) and A_Baseline (pullback).
+       Others: -Variants B_NextCandle,C_FlatFilter,D_BreakEven
     4. Collects every report, journal and log into ONE zip on your Desktop.
 
   Requirements:
@@ -23,7 +25,7 @@ param(
     [string]   $To       = "2026.08.31",
     [int]      $Deposit  = 10000,
     [int]      $Leverage = 100,
-    [string[]] $Variants = @("A_Baseline", "B_NextCandle", "C_FlatFilter", "D_BreakEven"),
+    [string[]] $Variants = @("X_Crossover", "X_CrossTrend", "A_Baseline"),
     [string]   $AppData  = $env:APPDATA,
     [string]   $OutRoot  = [Environment]::GetFolderPath("Desktop"),
     [string]   $Login    = "",
