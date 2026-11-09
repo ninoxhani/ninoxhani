@@ -12,5 +12,6 @@ reports/2026-11-xx_A_Baseline_XAUUSD_<broker>/
 ```
 
 `compile/` holds the verified MetaEditor compile log for v1.00.
+`selftest/` holds the MT5 Experts log of the 72/72 self-test run.
 **No backtest reports exist yet.** No backtest has been executed for v1.00.
 Do not add numbers to STATUS.md that are not backed by a file in this folder.

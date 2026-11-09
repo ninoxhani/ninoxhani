@@ -8,7 +8,8 @@ MetaTrader 5:
 - **Exit:** structural swing stop-loss and a fixed **1.5R** take-profit.
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
 
-> **Status: NOT VALIDATED.** Compiles with 0 errors / 0 warnings (MetaEditor build 6308), but no
+> **Status: NOT VALIDATED.** Compiles with 0 errors / 0 warnings (MetaEditor build 6308) and passes
+> its 72 logic self-tests, but no
 > backtest has been run yet and there is no evidence of a
 > positive edge. Do not trade real money with it. See [STATUS.md](STATUS.md).
 

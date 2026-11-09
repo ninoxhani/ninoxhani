@@ -2,8 +2,9 @@
 
 ## 1.00 — 2026-11-08 (initial implementation)
 
-Compiled with MetaEditor build 6308: **0 errors, 0 warnings** (`reports/compile/`). Runtime and
-performance are not yet tested.
+Compiled with MetaEditor build 6308: **0 errors, 0 warnings** (`reports/compile/`).
+Built-in self-tests: **72 passed, 0 failed** in MT5 build 6308 (`reports/selftest/`).
+Trading behaviour and performance are not yet tested (Strategy Tester needs a broker account).
 
 New standalone project. No existing ALB FOREX EA files were present in this repository or modified.
 

@@ -1,6 +1,6 @@
 # STATUS — ALB_FOREX_EMA_SCALPER_EA
 
-**Version:** 1.00 · **Date:** 2026-11-08 · **Readiness: INCOMPLETE**
+**Version:** 1.00 · **Updated:** 2026-11-09 · **Readiness: INCOMPLETE**
 
 > Read this file first when resuming work. It separates what is implemented, what is verified
 > with evidence, and what is still open. Never upgrade a status without evidence in `reports/`.
@@ -11,12 +11,12 @@
 |---|---|
 | Source implemented | ✅ done |
 | Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** — MetaEditor build 6308, `reports/compile/2026-11-08_v1.00_compile.log` |
-| Self-tests pass (72 checks) | ⬜ not run (need a compiled `.ex5`) |
-| Functional backtests T1 | ⬜ not run |
+| Self-tests pass (72 checks) | ✅ **VERIFIED** — 72 passed, 0 failed in MT5 build 6308, `reports/selftest/2026-11-09_v1.00_selftest_experts.log` |
+| Functional backtests T1 | ⬜ not run — Strategy Tester needs a broker account (not available in the sandbox) |
 | Edge cases T2 | ⬜ not run |
 | Research backtests T3 (in/out-of-sample) | ⬜ not run — **no performance data exists** |
 | Demo forward test T4 | ⬜ not run |
-| **Overall** | **INCOMPLETE** — compiled, but no runtime test yet; not DEMO READY until T0.2 + T1 pass; not a LIVE CANDIDATE |
+| **Overall** | **INCOMPLETE** — compiles and pure logic is self-tested, but no trading test yet; not DEMO READY until T1 passes; not a LIVE CANDIDATE |
 
 ## Completed implementation (v1.00)
 
@@ -50,10 +50,12 @@ All items of the master prompt Phases 1–6 are implemented in `ALB_FOREX_EMA_SC
 | Presets contain every EA input with source defaults | `tools/make_presets.py` parses 78 inputs from the source | presets only |
 | Source file is plain ASCII, single copy of every function | checked in this session | text only |
 | **Compiles: 0 errors, 0 warnings** | `reports/compile/2026-11-08_v1.00_compile.log` (MetaEditor64 5.0.0.6308, source SHA-256 `cd2e91c7…88f4`) | compilation only |
+| **72 self-tests pass at runtime** (trend, band touch, Mode A/B patterns, swing detection, tick rounding, TP, volume sizing, spread ratio, flat filter, day boundary, sessions, news parsing) | `reports/selftest/2026-11-09_v1.00_selftest_experts.log` | pure logic functions only |
+| EA initialises and deinitialises cleanly on a live chart; preset file is read (78 inputs) | same log + terminal journal | EURUSD sample chart, no broker account, no ticks |
 
-**Nothing about runtime behaviour or trading performance has been verified.** Compiling proves
-the code is valid MQL5 — not that the logic behaves correctly at runtime.
-The logic was reviewed line by line, but review is not evidence.
+**Not yet verified:** order execution, SL/TP placement, sizing against a real contract,
+daily limit, news filter, and any trading performance. The self-tests cover the pure decision
+functions only; the terminal-dependent code (orders, history, calendar) has not run with ticks.
 
 ## Compilation status
 
@@ -70,11 +72,15 @@ The logic was reviewed line by line, but review is not evidence.
 
 ## Test results
 
-None. No backtest, forward test or self-test has been executed. **No performance statistics exist.**
+- **T0.1 compile:** PASSED (0 errors, 0 warnings).
+- **T0.2 self-tests:** PASSED (72/72) — MT5 build 6308, 2026-11-09.
+- **Strategy Tester:** NOT RUN. Attempted on the terminal's offline EURUSD sample data as a
+  functional check; MT5 refused: `tester not started because the account is not specified`. A broker
+  (demo) account is required, which this sandbox does not have.
+- **No backtest, forward test or performance statistics exist.**
 
 ## Incomplete / unverified
 
-- Self-tests (T0.2) — need a running MT5 terminal.
 - All functional, edge-case, research and demo tests (TEST_PLAN T1–T4).
 - News filter: live calendar path, CSV export and tester CSV path are untested. Calendar time
   stamps for past events may reflect the broker's current UTC offset (DST) — verify a few known
@@ -85,7 +91,7 @@ None. No backtest, forward test or self-test has been executed. **No performance
 
 ## Known defects / limitations
 
-- No verified defects (nothing has run yet).
+- No verified defects. Trading paths have not run yet, so defects there would not have surfaced.
 - `MaxTradesPerDay` in ALERT_ONLY counts alerts; position-based rules cannot be simulated there
   (no virtual positions).
 - If `TradingSymbol` differs from the chart symbol, signals are evaluated only on chart ticks.
@@ -95,8 +101,8 @@ None. No backtest, forward test or self-test has been executed. **No performance
 ## Next required action
 
 1. ~~Compile~~ — done (0 errors, 0 warnings).
-2. Run `Test_SelfTests.set` → expect `72 passed, 0 failed`.
-3. Run TEST_PLAN **T1** functional checks on 1–2 weeks of real-tick data, especially T1.1 (look-ahead),
+2. ~~Self-tests~~ — done (72/72).
+3. On your Windows MT5 (logged in to a demo account of your broker, XAUUSD real ticks available): run TEST_PLAN **T1** functional checks on 1–2 weeks of real-tick data, especially T1.1 (look-ahead),
    T1.4 (TP), T1.5 (sizing), T1.11 (daily limit + emergency close).
 4. Only then run **T3** variants A–D with identical dates and an untouched out-of-sample period,
    and store reports in `reports/`.
