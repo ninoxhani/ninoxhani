@@ -33,6 +33,8 @@ ALB_FOREX_EMA_SCALPER_EA/
 ├── presets/                       .set files for each research variant and test
 ├── tests/                         Strategy Tester .ini configs (command-line backtests)
 ├── reports/                       put tester reports here (empty until tests are run)
+├── RUN_BACKTESTS.bat              one-click: runs variants A-D in MT5 and zips the results
+├── tools/run_backtests.ps1        the PowerShell script behind RUN_BACKTESTS.bat
 ├── tools/make_presets.py          regenerates presets from the source defaults
 └── *.md                           documentation
 ```
@@ -86,6 +88,22 @@ The dashboard (top-left) shows the mode, execution status, M5 trend, daily P/L v
 entries today, news-filter status, open position and the last evaluation result.
 
 ## 6. Run a Strategy Tester backtest
+
+### 6a. One click (recommended)
+
+1. Log in to your broker account in MT5 once with **Save password** ticked, then **close MT5**.
+2. Double-click **`RUN_BACKTESTS.bat`** in this folder. (If Windows SmartScreen warns:
+   *More info → Run anyway*.)
+3. Wait. It runs variants A, B, C and D one after another on `XAUUSD.std`, M1, real ticks,
+   2026.04.01 → 2026.08.31, deposit 10 000 USD. The first run also downloads tick data.
+   The PC must stay on.
+4. At the end a single file `ALBFX_Backtests_<date>.zip` appears on your Desktop with every
+   report, journal and log. Send that file for analysis.
+
+Other symbol or dates: `powershell -ExecutionPolicy Bypass -File tools\run_backtests.ps1 -Symbol XAUUSD -From 2026.04.01 -To 2026.08.31`.
+The out-of-sample period (2026.09.01 onward) is deliberately not part of the default run.
+
+### 6b. Manually
 
 1. **View → Strategy Tester** (Ctrl+R).
 2. Expert: `ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_EMA_SCALPER_EA`.

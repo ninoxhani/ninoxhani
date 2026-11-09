@@ -109,7 +109,9 @@ functions only; the terminal-dependent code (orders, history, calendar) has not 
 
 1. ~~Compile~~ — done (0 errors, 0 warnings).
 2. ~~Self-tests~~ — done (v1.01: 74/74).
-3. On your Windows MT5 (logged in to a demo account of your broker, XAUUSD real ticks available): run TEST_PLAN **T1** functional checks on 1–2 weeks of real-tick data, especially T1.1 (look-ahead),
+3. **Owner action:** double-click `RUN_BACKTESTS.bat` (runs A–D in-sample 2026.04.01–08.31 on XAUUSD.std and
+   zips all results to the Desktop), then send the zip. Script dry-run and full simulation tested; the generated
+   tester `.ini` was accepted by real MT5 build 6308. Equivalent manual route: run TEST_PLAN **T1** functional checks on 1–2 weeks of real-tick data, especially T1.1 (look-ahead),
    T1.4 (TP), T1.5 (sizing), T1.11 (daily limit + emergency close).
 4. Only then run **T3** variants A–D with identical dates and an untouched out-of-sample period,
    and store reports in `reports/`.

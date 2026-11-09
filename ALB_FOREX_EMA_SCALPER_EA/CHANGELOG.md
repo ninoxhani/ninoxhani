@@ -15,6 +15,12 @@ Added
 - Input `InpDriftExcludesSpread` (default true). false = v1.00 behaviour, for comparison only.
 - Pure function `AfxDriftATR` + 2 self-tests (72 → 74).
 
+Added (tools, EA code unchanged)
+- `RUN_BACKTESTS.bat` + `tools/run_backtests.ps1`: one double-click finds MT5 (via `origin.txt`), installs
+  the EA and presets, runs variants A–D unattended (real ticks, M1, in-sample period) and zips every
+  report/journal/log to the Desktop. Tested with PowerShell 7 dry run + simulated terminal; the generated
+  `.ini` was parsed by real MT5 build 6308.
+
 Changed (cosmetic)
 - Dashboard panel widened so the last line is no longer cut off.
 - Dashboard shows `+0.00%` instead of `-0.00%` when daily P/L is zero.
