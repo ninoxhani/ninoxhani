@@ -1,3 +1,4 @@
 *.set binary
 *.ini -text
 *.mq5 text eol=lf
+*.ex5 binary

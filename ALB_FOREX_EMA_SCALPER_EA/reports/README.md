@@ -11,5 +11,6 @@ reports/2026-11-xx_A_Baseline_XAUUSD_<broker>/
     notes.md                                 (broker, data source, dates, spread/commission model)
 ```
 
-**No reports exist yet.** No backtest has been executed for v1.00.
+`compile/` holds the verified MetaEditor compile log for v1.00.
+**No backtest reports exist yet.** No backtest has been executed for v1.00.
 Do not add numbers to STATUS.md that are not backed by a file in this folder.

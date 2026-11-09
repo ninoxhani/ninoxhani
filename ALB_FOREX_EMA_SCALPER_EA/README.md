@@ -8,7 +8,8 @@ MetaTrader 5:
 - **Exit:** structural swing stop-loss and a fixed **1.5R** take-profit.
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
 
-> **Status: NOT VALIDATED.** No backtest has been run yet and there is no evidence of a
+> **Status: NOT VALIDATED.** Compiles with 0 errors / 0 warnings (MetaEditor build 6308), but no
+> backtest has been run yet and there is no evidence of a
 > positive edge. Do not trade real money with it. See [STATUS.md](STATUS.md).
 
 This project is independent. It does **not** change or share code with the ALB FOREX
@@ -27,6 +28,7 @@ Supply & Demand EA, Tradivo ProShi, EAGLE or any TradingView indicator.
 ```
 ALB_FOREX_EMA_SCALPER_EA/
 ├── ALB_FOREX_EMA_SCALPER_EA.mq5   EA source (single file, no external includes)
+├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled EA (MetaEditor build 6308)
 ├── presets/                       .set files for each research variant and test
 ├── tests/                         Strategy Tester .ini configs (command-line backtests)
 ├── reports/                       put tester reports here (empty until tests are run)

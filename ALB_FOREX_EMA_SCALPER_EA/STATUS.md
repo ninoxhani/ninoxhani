@@ -10,13 +10,13 @@
 | Gate | Status |
 |---|---|
 | Source implemented | ✅ done |
-| Compiles with 0 errors / 0 warnings | ⬜ **NOT VERIFIED** — no MetaEditor run yet (see below) |
+| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** — MetaEditor build 6308, `reports/compile/2026-11-08_v1.00_compile.log` |
 | Self-tests pass (72 checks) | ⬜ not run (need a compiled `.ex5`) |
 | Functional backtests T1 | ⬜ not run |
 | Edge cases T2 | ⬜ not run |
 | Research backtests T3 (in/out-of-sample) | ⬜ not run — **no performance data exists** |
 | Demo forward test T4 | ⬜ not run |
-| **Overall** | **INCOMPLETE** — not DEMO READY until T0 passes; not a LIVE CANDIDATE |
+| **Overall** | **INCOMPLETE** — compiled, but no runtime test yet; not DEMO READY until T0.2 + T1 pass; not a LIVE CANDIDATE |
 
 ## Completed implementation (v1.00)
 
@@ -49,22 +49,24 @@ All items of the master prompt Phases 1–6 are implemented in `ALB_FOREX_EMA_SC
 |---|---|---|
 | Presets contain every EA input with source defaults | `tools/make_presets.py` parses 78 inputs from the source | presets only |
 | Source file is plain ASCII, single copy of every function | checked in this session | text only |
+| **Compiles: 0 errors, 0 warnings** | `reports/compile/2026-11-08_v1.00_compile.log` (MetaEditor64 5.0.0.6308, source SHA-256 `cd2e91c7…88f4`) | compilation only |
 
-**Nothing about runtime behaviour, compilation or trading performance has been verified.**
+**Nothing about runtime behaviour or trading performance has been verified.** Compiling proves
+the code is valid MQL5 — not that the logic behaves correctly at runtime.
 The logic was reviewed line by line, but review is not evidence.
 
 ## Compilation status
 
-**NOT VERIFIED.**
+**VERIFIED — 0 errors, 0 warnings.**
 
-- This work was done in a Linux cloud sandbox without MetaTrader. The official MetaQuotes
-  installer (`mt5setup.exe`, signed by MetaQuotes Ltd, SHA-256
-  `a879492dd9d7b168d0538edd1c0dc5604ca43dc0951825b3501818e8b18f4c93`) was downloaded to set up
-  MetaEditor under Wine, but running it was blocked by the sandbox's safety policy pending owner
-  approval. **No compiler has processed this source yet.**
-- No `.ex5` is included. One will only be added together with a real compiler log.
-- Risk: MQL5 compile errors or warnings are possible. They are expected to be small (type casts,
-  API signature details) but are unknown until compiled.
+- Compiler: MetaEditor64.exe FileVersion **5.0.0.6308** (official MetaQuotes installer, signed by
+  MetaQuotes Ltd, installer SHA-256 `a879492d…4c93`), run under WineHQ 11.0 in a Linux cloud sandbox
+  with the owner's approval. Ubuntu's Wine 9.0 could not run MetaEditor (false "debugger detected").
+- Result: `Result: 0 errors, 0 warnings, 2627 ms elapsed, cpu='X64 Regular'`
+- Source SHA-256: `cd2e91c70c48bf00a70b1d3980c68e5687d832e06c206aae42fa45f24be288f4`
+- `ALB_FOREX_EMA_SCALPER_EA.ex5` SHA-256: `33683b75cc8a3cea30087298922067d734a2ec27ba9abacf8c969a2fec592947`
+- Full log: `reports/compile/2026-11-08_v1.00_compile.log`
+- Recompiling on your own MetaEditor (F7) is still recommended; any newer build should also report 0/0.
 
 ## Test results
 
@@ -72,7 +74,7 @@ None. No backtest, forward test or self-test has been executed. **No performance
 
 ## Incomplete / unverified
 
-- Compilation (T0.1) and self-tests (T0.2).
+- Self-tests (T0.2) — need a running MT5 terminal.
 - All functional, edge-case, research and demo tests (TEST_PLAN T1–T4).
 - News filter: live calendar path, CSV export and tester CSV path are untested. Calendar time
   stamps for past events may reflect the broker's current UTC offset (DST) — verify a few known
@@ -92,8 +94,7 @@ None. No backtest, forward test or self-test has been executed. **No performance
 
 ## Next required action
 
-1. **Compile** `ALB_FOREX_EMA_SCALPER_EA.mq5` in MetaEditor (F7) on Windows, or approve running
-   the MetaQuotes installer in the sandbox. Fix every error and warning. Record the log here.
+1. ~~Compile~~ — done (0 errors, 0 warnings).
 2. Run `Test_SelfTests.set` → expect `72 passed, 0 failed`.
 3. Run TEST_PLAN **T1** functional checks on 1–2 weeks of real-tick data, especially T1.1 (look-ahead),
    T1.4 (TP), T1.5 (sizing), T1.11 (daily limit + emergency close).

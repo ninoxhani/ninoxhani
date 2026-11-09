@@ -1,6 +1,9 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
-## 1.00 — 2026-11-08 (initial implementation, compilation unverified)
+## 1.00 — 2026-11-08 (initial implementation)
+
+Compiled with MetaEditor build 6308: **0 errors, 0 warnings** (`reports/compile/`). Runtime and
+performance are not yet tested.
 
 New standalone project. No existing ALB FOREX EA files were present in this repository or modified.
 
@@ -30,3 +33,4 @@ Added
     (all required metrics), 72 built-in logic self-tests.
 - Documentation: README, STRATEGY_SPEC, CONFIGURATION, TEST_PLAN, STATUS.
 - `presets/` (9 `.set` files), `tests/` (4 tester `.ini` files), `tools/make_presets.py`.
+- `ALB_FOREX_EMA_SCALPER_EA.ex5` compiled binary and `reports/compile/2026-11-08_v1.00_compile.log`.
