@@ -1,6 +1,6 @@
 # STATUS — ALB FOREX EMA 8/14 EAs (baseline + Scalper Pro)
 
-**Version:** 1.20 · **Updated:** 2026-11-10 · **Readiness: INCOMPLETE**
+**Version:** 1.21 · **Updated:** 2026-11-10 · **Readiness: INCOMPLETE**
 
 > Read this file first when resuming work. It separates what is implemented, what is verified
 > with evidence, and what is still open. Never upgrade a status without evidence in `reports/`.
@@ -10,8 +10,8 @@
 | Gate | Status |
 |---|---|
 | Source implemented | ✅ done — two robots over one core (`ALB_FOREX_EMA_CORE.mqh`) |
-| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.20, both robots) — `reports/compile/2026-11-10_v1.20_compile.log` |
-| Self-tests pass (105 checks) | ✅ **VERIFIED** (v1.20, both robots) — `reports/selftest/2026-11-10_v1.20_selftest_experts.log` |
+| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.21, both robots) — `reports/compile/2026-11-10_v1.21_compile.log` |
+| Self-tests pass (108 checks) | ✅ **VERIFIED** (v1.21, both robots) — `reports/selftest/2026-11-10_v1.21_selftest_experts.log` |
 | Functional backtests T1 | ⬜ not done — the owner's runs so far: see "Test results" |
 | Edge cases T2 | ⬜ not run |
 | Research backtests T3 (in/out-of-sample) | ⬜ not run — **no backtest performance data exists** |
@@ -27,6 +27,8 @@
 
 ## Completed implementation
 
+- **v1.21** (2026-11-10): mid-day start no longer counts a same-day position twice in the day P/L
+  (owner screen: `Day P/L +0.56` with the account at +0.28). State version 121.
 - **v1.20** (2026-11-10, owner request "more trades, but valuable ones; get in and out fast"):
   - SCALPER PRO entry mode: fresh M1 crosses + trend-continuation pullbacks (max 3 per leg), M5
     trend alignment, momentum candle, EMA14 slope, ATR-vs-spread and ATR-spike filters, stop behind
@@ -51,10 +53,10 @@
 
 | What | Evidence | Scope |
 |---|---|---|
-| **Both robots compile: 0 errors, 0 warnings** | `reports/compile/2026-11-10_v1.20_compile.log` (MetaEditor64 5.0.0.6308; SHA-256 of all sources and binaries inside) | compilation only |
-| **105 self-tests pass at runtime, both robots** — patterns, swings, rounding, TP, sizing, spread, drift, flat filter, day boundary, sessions, news parsing, crossover, scalper leg/momentum/stop/break-even/stale/EMA exit/loss streak, daily-loss model incl. the deposit cases | `reports/selftest/2026-11-10_v1.20_selftest_experts.log` | pure logic functions only |
+| **Both robots compile: 0 errors, 0 warnings** | `reports/compile/2026-11-10_v1.21_compile.log` (MetaEditor64 5.0.0.6308; SHA-256 of all sources and binaries inside) | compilation only |
+| **108 self-tests pass at runtime, both robots** — patterns, swings, rounding, TP, sizing, spread, drift, flat filter, day boundary, sessions, news parsing, crossover, scalper leg/momentum/stop/break-even/stale/EMA exit/loss streak, daily-loss model incl. the deposit cases | `reports/selftest/2026-11-10_v1.21_selftest_experts.log` | pure logic functions only |
 | Both robots start and stop cleanly; Scalper Pro opens in SCALPER PRO mode, magic 81420262, unlimited trades; presets are read (108 inputs) | same log | EURUSD sample chart, no broker account, no ticks |
-| Earlier versions: compile + self-tests v1.00 (72/72), v1.01 (74/74), v1.10 (80/80) | `reports/compile/`, `reports/selftest/` | history |
+| Earlier versions: compile + self-tests v1.00 (72/72), v1.01 (74/74), v1.10 (80/80), v1.20 (105/105) | `reports/compile/`, `reports/selftest/` | history |
 | Live calendar news filter works on a broker demo | owner screenshots 2026-11-09 (Lirunex) and 2026-11-10 (IC Markets) | live path only |
 
 **Not yet verified:** Scalper Pro trading behaviour (entries, BE/stale/EMA exits, cooldown/pause) on
@@ -62,14 +64,19 @@ ticks, the new daily-loss model on a live account, and any backtest performance.
 
 ## Compilation status
 
-**VERIFIED — 0 errors, 0 warnings** for every version (v1.00, v1.01, v1.10, v1.20).
+**VERIFIED — 0 errors, 0 warnings** for every version (v1.00, v1.01, v1.10, v1.20, v1.21).
 Compiler: MetaEditor64.exe **5.0.0.6308** (official MetaQuotes installer, signed by MetaQuotes Ltd),
 under WineHQ 11.0 in a Linux cloud sandbox with the owner's approval. Hashes in the compile logs.
 Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE.mqh` next to the `.mq5` files.
 
 ## Test results
 
-- **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.20: 0/0 and 105/105, both robots).
+- **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.21: 0/0 and 108/108, both robots).
+- **Owner demo, 2026-11-10 ~20:25 server (IC Markets demo 53134733, v1.20 Scalper Pro on XAUUSD):** robot
+  active and evaluating (`Entry: SCALPER PRO`, executing, live news OK, no halt), 0 trades yet.
+  Panel `Day P/L +0.56` vs account +0.28: a position open at the robot's start was counted twice by
+  the mid-day reconstruction → fixed in v1.21 (only overstated profit here, but the mirror case
+  could overstate a loss).
 - **Owner demo run, 2026-11-10 (IC Markets demo 53134676, hedging, XAUUSD M1, v1.10):**
   - The robot ran in **PULLBACK** mode with default inputs (panel: `Confirm: A same candle`, `RR 1:1.50`,
     `Entries today 3/5`), not in the scalper mode the owner intended → reason for the low trade count.

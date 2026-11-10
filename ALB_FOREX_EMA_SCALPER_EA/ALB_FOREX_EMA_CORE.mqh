@@ -42,8 +42,8 @@
    #define AFX_DEF_COMMENT       "ALBFX_EMA"
 #endif
 
-#define AFX_EA_VERSION           "1.20"
-#define AFX_STATE_VERSION        120
+#define AFX_EA_VERSION           "1.21"
+#define AFX_STATE_VERSION        121
 #define AFX_OBJ_PREFIX           "AFXES_"
 #define AFX_MAX_RISK_PERCENT     5.0
 #define AFX_MAX_DAILY_LOSS_PCT   20.0
@@ -586,6 +586,19 @@ int AfxTrailingLosses(const double &nets[], const int n)
    return c;
   }
 
+//--- Floating P/L at the day start, rebuilt when the robot starts mid-day: only positions that
+//--- were already open at the day start had floating P/L then. A position opened later today
+//--- contributes 0 (all of its P/L belongs to today and is counted as realised/floating later).
+double AfxFloatingAtDayStart(const double &floats[], const datetime &opened[], const int n, const datetime dayStart)
+  {
+   double f = 0.0;
+   int m = IMin(n, IMin(ArraySize(floats), ArraySize(opened)));
+   for(int i = 0; i < m; i++)
+      if(opened[i] < dayStart)
+         f += floats[i];
+   return f;
+  }
+
 //--- Cash flow since the baseline inferred from the balance: every balance change that is not
 //--- explained by trading deals is a deposit/withdrawal. Immune to deal time-stamp races.
 double AfxCashFlowSinceBase(const double balCrNow, const double balCrAtBase, const double realisedSinceBase)
@@ -1066,6 +1079,12 @@ int RunSelfTests()
    ST(StEq(AfxCashFlowSinceBase(1000.0, 1000.0, 0.0), 0.0), "deposit already in the baseline is not counted twice");
    ST(StEq(AfxCashFlowSinceBase(1000.0, 0.0, 0.0), 1000.0), "deposit after the baseline raises the % base");
    ST(StEq(AfxCashFlowSinceBase(1017.61, 1000.0, 17.61), 0.0), "trading profit is not a cash flow");
+//--- v1.21: a position opened today, open at -0.28 when the robot starts, later closed at +0.28
+   double   pf[2] = {-0.28, 5.0};
+   datetime po[2] = {D'2026.11.10 18:00', D'2026.11.09 15:00'};
+   ST(StEq(AfxFloatingAtDayStart(pf, po, 1, D'2026.11.10 00:00'), 0.0), "position opened today had no floating P/L at the day start");
+   ST(StEq(AfxFloatingAtDayStart(pf, po, 2, D'2026.11.10 00:00'), 5.0), "overnight position keeps its floating P/L as the start value");
+   ST(StEq(AfxDayLossMoney(0.28, 0.0, AfxFloatingAtDayStart(pf, po, 1, D'2026.11.10 00:00')), -0.28), "day P/L +0.28 after it closes (not +0.56)");
 
 //--- band touch
    ST(AfxBandTouch(1998.8, 2001.0, 2000.0, 1999.0), "touch: wick through band");
@@ -1572,8 +1591,9 @@ void ResetDayFields(const datetime ds)
 
 //--- First start on a broker day without persisted state.
 //--- Live: count today's realised trading P/L from the day start (losses realised before the
-//--- robot started are not forgotten); floating P/L that existed before the start is taken as
-//--- unchanged. Tester: snapshot at the start.
+//--- robot started are not forgotten). Floating P/L at the day start = current floating P/L of the
+//--- positions that were already open at the day start (taken as unchanged); positions opened
+//--- later today start from 0. Tester: snapshot at the start.
 void ReconstructBaseline(const datetime now, const datetime ds)
   {
    double eq    = AccountInfoDouble(ACCOUNT_EQUITY);
@@ -1608,8 +1628,23 @@ void ReconstructBaseline(const datetime now, const datetime ds)
      }
    else
      {
+      double fl[];
+      datetime op[];
+      int np = PositionsTotal();
+      ArrayResize(fl, np);
+      ArrayResize(op, np);
+      int k = 0;
+      for(int i = 0; i < np; i++)
+        {
+         ulong tk = PositionGetTicket(i);
+         if(tk == 0)
+            continue;
+         fl[k] = PositionGetDouble(POSITION_PROFIT) + PositionGetDouble(POSITION_SWAP);
+         op[k] = (datetime)PositionGetInteger(POSITION_TIME);
+         k++;
+        }
       g_day.bal0        = balcr - tradePnL - cf;   // balance + credit at the day start
-      g_day.flt0        = eq - balcr;              // floating P/L taken as unchanged since the day start
+      g_day.flt0        = AfxFloatingAtDayStart(fl, op, k, ds); // positions opened today had no P/L at the day start
       g_day.baseEquity  = g_day.bal0 + g_day.flt0;
       g_day.baseTime    = ds;
       g_day.cfInclusive = true;

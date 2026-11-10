@@ -1,4 +1,4 @@
-# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.20
+# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.21
 
 This document describes **exactly what the source code implements**. Where the master
 prompt left a choice open, the chosen default and the reason are recorded under
@@ -267,9 +267,11 @@ volume      = floor(riskBudget / lossPerLot / step) × step
   shows scope, loss, base, realised and floating parts. Existing SL/TP stay in place.
 - `EmergencyCloseOnDailyLimit` (false): also close **this EA's** positions while at/below the floor.
 - First start on a day without stored state (live): `T0` = day start, so today's realised losses
-  before the robot started still count; floating P/L that existed before the start is taken as
-  unchanged. Tester: snapshot at the start.
-- Persistence (terminal global variables per login + magic + symbol, state version 120): day,
+  before the robot started still count. `F0` = floating P/L of the positions that were already open
+  at the day start (taken as unchanged); positions opened later today start from 0, so their P/L is
+  counted once (v1.20 used all current floating P/L and could count a same-day position twice).
+  Tester: snapshot at the start.
+- Persistence (terminal global variables per login + magic + symbol, state version 121): day,
   `E0`, `B0`, `F0`, `T0`, halt flag, entry/alert counts, last acted-on signal candle. States from
   older versions are ignored (a new baseline is built). Disabled in the Strategy Tester.
 

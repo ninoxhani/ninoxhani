@@ -18,7 +18,7 @@
 //+------------------------------------------------------------------+
 #property copyright   "ALB FOREX"
 #property link        "https://albforex.al"
-#property version     "1.20"
+#property version     "1.21"
 #property description "ALB FOREX Scalper Pro - XAUUSD M1 EMA 8/14 scalper with M5 trend filter."
 #property description "Crosses + trend continuations, fast exits, loss-streak pause, 2% daily guard."
 #property description "Experimental research EA - NOT validated for live trading."

@@ -1,4 +1,4 @@
-# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.20
+# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.21
 
 The MT5 inputs dialog shows the **label** (text after `//` in the source). Preset `.set` files
 and the tester `.ini` use the **variable name** (`Inp…`). Both are listed below.
@@ -164,7 +164,7 @@ Everything else below has the same default in both.
 | Push notifications | `InpEnablePushNotifications` | false | live only; needs MetaQuotes ID in terminal settings |
 | Journal CSV | `InpWriteJournalCsv` | true | `Common\Files\ALBFX_EMA_SCALPER_Journal_<symbol>_<magic>_<TESTER|LIVE>.csv` |
 | Extended tester report | `InpWriteTesterReport` | true | `Common\Files\ALBFX_EMA_SCALPER_Report_<symbol>_<ModeA|ModeB>.txt` + journal log |
-| Run self-tests | `InpRunSelfTests` | false | runs 105 logic checks in `OnInit`; the EA refuses to start if any fail |
+| Run self-tests | `InpRunSelfTests` | false | runs 108 logic checks in `OnInit`; the EA refuses to start if any fail |
 
 ## Rejection codes (log, journal, report)
 

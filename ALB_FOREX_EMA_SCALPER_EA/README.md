@@ -23,7 +23,7 @@ after 10 bars, 3-bar cooldown after a loss, 60-minute pause after 3 losses in a 
 - Also available via `EntryMode`: `CROSSOVER` (v1.10, every M1 cross, simple ATR stop).
 
 > **Status: NOT VALIDATED.** Both robots compile with 0 errors / 0 warnings (MetaEditor build 6308)
-> and pass their 105 logic self-tests, but no
+> and pass their 108 logic self-tests, but no
 > backtest has been run yet and there is no evidence of a
 > positive edge. Do not trade real money with it. See [STATUS.md](STATUS.md).
 
@@ -42,8 +42,8 @@ Supply & Demand EA, Tradivo ProShi, EAGLE or any TradingView indicator.
 
 ```
 ALB_FOREX_EMA_SCALPER_EA/
-├── ALB_FOREX_SCALPER_PRO.ex5      compiled Scalper Pro robot v1.20
-├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled baseline robot v1.20
+├── ALB_FOREX_SCALPER_PRO.ex5      compiled Scalper Pro robot v1.21
+├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled baseline robot v1.21
 ├── ALB_FOREX_SCALPER_PRO.mq5      Scalper Pro source (defaults only)
 ├── ALB_FOREX_EMA_SCALPER_EA.mq5   baseline source (defaults only)
 ├── ALB_FOREX_EMA_CORE.mqh         shared core: all strategy, risk and execution code
@@ -77,7 +77,7 @@ If the compiler reports anything, copy the full *Errors* tab text and send it ba
 
 Optional check: attach the EA with the `Test_SelfTests.set` preset (or set
 **Run built-in logic self-tests on start = true**). The *Experts* tab must show
-`[AFX-EMA][SELFTEST] 105 passed, 0 failed`.
+`[AFX-EMA][SELFTEST] 108 passed, 0 failed`.
 
 ## 3. Enable Algo Trading
 

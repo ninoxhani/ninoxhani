@@ -1,4 +1,4 @@
-# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.20
+# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.21
 
 Status of every item is tracked in [STATUS.md](STATUS.md). An item is **PASSED** only with
 evidence (compiler log, tester report, journal lines). Nothing below has been passed yet
@@ -9,7 +9,7 @@ unless STATUS.md says so.
 | ID | Test | Pass criterion | Evidence |
 |---|---|---|---|
 | T0.1 | Compile in MetaEditor (F7) | `0 errors, 0 warnings` | copy of the *Errors* tab |
-| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 105 passed, 0 failed` (both robots) and EA starts | *Experts*/*Journal* line |
+| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 108 passed, 0 failed` (both robots) and EA starts | *Experts*/*Journal* line |
 
 The self-tests cover: trend direction, band touch, Mode A BUY/SELL, Mode B touch/confirm/
 invalidation, entry-TF alignment, swing detection (strictness, right-bar confirmation,

@@ -11,7 +11,7 @@ reports/2026-11-xx_A_Baseline_XAUUSD_<broker>/
     notes.md                                 (broker, data source, dates, spread/commission model)
 ```
 
-`compile/` holds the verified MetaEditor compile logs (v1.00, v1.01, v1.10, v1.20).
-`selftest/` holds the MT5 Experts logs of the self-test runs (v1.00 72/72, v1.01 74/74, v1.10 80/80, v1.20 105/105).
+`compile/` holds the verified MetaEditor compile logs (v1.00, v1.01, v1.10, v1.20, v1.21).
+`selftest/` holds the MT5 Experts logs of the self-test runs (v1.00 72/72, v1.01 74/74, v1.10 80/80, v1.20 105/105, v1.21 108/108).
 **No backtest reports exist yet.** No backtest has been executed for v1.00.
 Do not add numbers to STATUS.md that are not backed by a file in this folder.

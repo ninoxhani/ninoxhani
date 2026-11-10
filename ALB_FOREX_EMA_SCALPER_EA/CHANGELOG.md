@@ -1,5 +1,20 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
+## 1.21 — 2026-11-10 (day P/L fix)
+
+Both robots: **0 errors, 0 warnings** (MetaEditor 6308), self-tests **108 passed, 0 failed**.
+
+Fixed
+- When a robot started mid-day while another position opened **today** was still open, that
+  position's P/L before the start was counted twice (once in its realised result, once through the
+  floating baseline). Seen on the owner's panel: `Day P/L +0.56` with the account at +0.28. Only
+  profit was overstated there, but the mirror case could overstate a loss and halt the robot.
+  The day-start floating P/L now includes only positions opened before the day start.
+- State version 121: a baseline saved by v1.20 is rebuilt on restart.
+
+Added
+- 3 self-tests for the reconstruction (`AfxFloatingAtDayStart`).
+
 ## 1.20 — 2026-11-10 (Scalper Pro robot + daily-loss fix)
 
 Both robots compile with MetaEditor build 6308: **0 errors, 0 warnings**. Self-tests: **105 passed,
