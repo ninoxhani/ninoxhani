@@ -1,4 +1,4 @@
-# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.10
+# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.20
 
 This document describes **exactly what the source code implements**. Where the master
 prompt left a choice open, the chosen default and the reason are recorded under
@@ -242,28 +242,39 @@ volume      = floor(riskBudget / lossPerLot / step) × step
 - `CheckDailyBudgetBeforeEntry` (true): skip the trade if today's loss + this trade's full planned
   loss would exceed the daily limit.
 
-## 12. Daily loss protection
+## 12. Daily loss protection (model rewritten in v1.20)
 
 - Broker day starts at server midnight (`DayResetHour` = 0).
-- Baseline = equity at the first tick of the broker day, adjusted by external cash flows
-  (deals of type `BALANCE`, `CREDIT`, `BONUS`) that occur after the baseline was captured. Deposits
-  therefore do not count as profit and withdrawals do not count as loss.
-- `daily loss % = (baseline − equity) / baseline × 100`, checked on **every tick and every second**
-  (timer), independent of signal evaluation.
-- At `MaxDailyLossPercent` (2 %): new entries disabled until the next broker day, reason logged,
-  alert raised, state persisted. Existing SL/TP orders stay in place.
-- `EmergencyCloseOnDailyLimit` (false): additionally close **this EA's** positions on this symbol
-  while equity is at/below the floor.
-- Persistence: terminal global variables keyed by login + magic + symbol store the day, baseline,
-  baseline time, halt flag, entry/alert counts and the last acted-on signal candle. They are
-  restored after a terminal restart on the same broker day.
-- First start on a day without stored state: baseline = the higher of current equity and
-  `balance + credit − today's realised trading P/L` (so losses already realised today are not
-  forgotten). The chosen source is logged.
-- Persistence is disabled in the Strategy Tester (every run starts clean).
+- **Baseline** (set on the first tick of the day, or on the robot's first tick): equity `E0`,
+  balance + credit `B0`, floating P/L `F0 = E0 − B0`, time `T0`. Live, the baseline is set only on
+  the **first tick** after start, when the account data is synchronised (never during an account
+  switch); until then new entries are blocked with `DATA_NOT_READY`.
+- **Day loss (money)**, scope `DailyLossScope`:
+  - `WHOLE ACCOUNT` (default): `loss = −(realised trading P/L since T0 + floating P/L now − F0)`.
+    Realised trading P/L = profit + commission + swap + fee of every non-cash-flow deal after `T0`
+    (all symbols).
+  - `THIS ROBOT ONLY`: `loss = −(this robot's realised P/L today + its floating P/L now)`.
+- **Deposits/withdrawals never enter the loss formula.** They are only used to scale the
+  percentage: `cash flow = (balance + credit − B0) − realised trading P/L since T0`, i.e. every
+  balance change not explained by trading. `loss % = loss / (E0 + cash flow) × 100`.
+  v1.00–v1.10 added deposit *deals* time-stamped after `T0` to the baseline; when the robot started
+  while MT5 was still loading the account (or a deposit was booked a second after start), the
+  deposit could be counted twice and produce a false halt (seen on 2026-11-10: three winning trades,
+  `Day P/L −7.37% HALTED`).
+- Checked on **every tick and every second** (timer). Before halting, the deal history is refreshed
+  and the loss recomputed, so a closed trade that is not yet in the history can not trigger a halt.
+- At `MaxDailyLossPercent` (2 %): new entries disabled until the next broker day; the log line
+  shows scope, loss, base, realised and floating parts. Existing SL/TP stay in place.
+- `EmergencyCloseOnDailyLimit` (false): also close **this EA's** positions while at/below the floor.
+- First start on a day without stored state (live): `T0` = day start, so today's realised losses
+  before the robot started still count; floating P/L that existed before the start is taken as
+  unchanged. Tester: snapshot at the start.
+- Persistence (terminal global variables per login + magic + symbol, state version 120): day,
+  `E0`, `B0`, `F0`, `T0`, halt flag, entry/alert counts, last acted-on signal candle. States from
+  older versions are ignored (a new baseline is built). Disabled in the Strategy Tester.
 
-This is an equity-based safety mechanism, **not a guaranteed loss cap**: equity can be affected
-by other strategies on the account, and gaps/slippage can push losses past the threshold.
+This is a safety mechanism, **not a guaranteed loss cap**: gaps and slippage can push losses past
+the threshold, and in `WHOLE ACCOUNT` scope other robots or manual trades on the same account count.
 
 ## 13. Trade frequency and duplicate prevention
 
@@ -345,3 +356,53 @@ Why SL 1.5 × ATR(M1): with ~0.20 USD spread and ATR(M1) ≈ 1.0–1.4 USD, a st
 
 Risk note: M1 crossovers on XAUUSD whipsaw often and every trade pays the spread. Whether this
 mode has any edge is unknown until the CROSSOVER backtests (`Backtest_X_*`) are run.
+
+## 18. Entry mode SCALPER PRO (v1.20, owner request 2026-11-10)
+
+Owner request: more trades than the pullback baseline, quick in and out, but only "valuable" trades.
+`EntryMode = SCALPER PRO` (default of the robot `ALB_FOREX_SCALPER_PRO`). All rules use closed bars.
+
+**Entries (M1)**
+| Type | Rule |
+|---|---|
+| CROSS | EMA8/EMA14 cross on shift 1 (`AfxCrossDirection`); the cross candle must close beyond **both** EMAs. `ScUseCrossEntries`. |
+| CONTINUATION | While EMA8/EMA14 stay aligned (M1 leg), a candle touches the EMA band and closes back beyond EMA8 in the leg direction (rule of §6 Mode A on M1). EMA14 slope over `ScSlopeBars` (3) bars ≥ `ScMinSlopeATR` (0.10) × ATR in the trade direction. At most `ScMaxEntriesPerLeg` (3) entries per M1 leg (the leg starts at the bar of the last cross; entries are counted from deal history, restart-safe). `ScUseContinuation`. |
+
+**Quality filters (both types)**
+- `ScTrendFilter` (true): direction must equal the latest closed M5 EMA 8/14 trend.
+- Momentum candle: body ≥ `ScMinBodyRatio` (0.40) × range, closing in the trade direction.
+- Cost/volatility: ATR(M1) ≥ `ScMinATRSpread` (5) × current spread.
+- Spike: ATR(M1, 14) ≤ `ScMaxATRRatio` (2.5) × ATR(M1, `ScATRLongPeriod` = 100) (avoids news bursts).
+- Flat-EMA filter on M5 (§7.1) is **ON** by default in the Scalper Pro robot.
+- All other gates of §7 apply (spread/SL ratio, drift, news, sessions, daily loss, one position).
+- Cooldown: no entry for `ScCooldownBars` (3) bars after a losing trade.
+- Loss streak: after `ScMaxConsecLosses` (3) losses in a row, pause `ScPauseMinutes` (60).
+- Optional day target `ScDailyTargetPct` (0 = off): stop new entries above +N % day profit.
+
+**Stop and target**
+- Stop behind the lowest low (BUY) / highest high (SELL) of the last `ScSLBars` (5) closed bars,
+  plus `ScSLBufferATR` (0.15) × ATR; SELL adds the spread (SELL stops trigger on Ask). Measured from
+  Bid (BUY) / Ask (SELL): closer than `ScMinSLATR` (0.8) × ATR → widened to that distance; farther
+  than `ScMaxSLATR` (2.5) × ATR → trade skipped (`SL_TOO_FAR`).
+- Target `RewardRisk` × stop (Scalper Pro default **1.0R**), re-anchored to the fill.
+
+**Active management ("get out fast")**
+- Break-even: at +`ScBreakEvenR` (0.6R) the stop moves to entry + `ScBreakEvenLockR` (0.10R).
+- Slow-EMA exit: on each new bar, if the closed candle closed beyond EMA14 against the trade → close.
+- Stale exit: after `ScStaleBars` (10) bars with progress < `ScStaleMinR` (0.25R) → close.
+- Opposite cross closes the open position (`CrossCloseOnOpposite`), before any entry filter.
+
+**Unchanged:** 0.5 % risk sizing via `OrderCalcProfit`, 2 % daily guard, one position per symbol,
+no martingale/grid/averaging, no lot increase after losses.
+
+All Scalper Pro thresholds are **untested placeholders** chosen from trading logic, not optimised.
+Whether this mode has an edge after costs is unknown until the `Backtest_S_*` runs are done.
+
+## 19. Robot files (v1.20)
+
+| File | Opens in | Magic | Notes |
+|---|---|---|---|
+| `ALB_FOREX_EMA_SCALPER_EA.ex5` | PULLBACK (baseline), max 5/day, 1.5R | 81420261 | all modes available via `EntryMode` |
+| `ALB_FOREX_SCALPER_PRO.ex5` | SCALPER PRO, unlimited trades, 1.0R, M5 flat filter on | 81420262 | can run next to the baseline robot |
+
+Both are built from the shared `ALB_FOREX_EMA_CORE.mqh`; the `.mq5` files only change defaults.

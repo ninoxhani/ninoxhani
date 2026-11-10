@@ -1,4 +1,4 @@
-# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.10
+# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.20
 
 Status of every item is tracked in [STATUS.md](STATUS.md). An item is **PASSED** only with
 evidence (compiler log, tester report, journal lines). Nothing below has been passed yet
@@ -9,7 +9,7 @@ unless STATUS.md says so.
 | ID | Test | Pass criterion | Evidence |
 |---|---|---|---|
 | T0.1 | Compile in MetaEditor (F7) | `0 errors, 0 warnings` | copy of the *Errors* tab |
-| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 80 passed, 0 failed` and EA starts | *Experts*/*Journal* line |
+| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 105 passed, 0 failed` (both robots) and EA starts | *Experts*/*Journal* line |
 
 The self-tests cover: trend direction, band touch, Mode A BUY/SELL, Mode B touch/confirm/
 invalidation, entry-TF alignment, swing detection (strictness, right-bar confirmation,
@@ -63,7 +63,10 @@ Run in the Strategy Tester, XAUUSD M1, *Every tick based on real ticks*, a 1–2
 | T2.17 | Stale price data | `MaxQuoteAgeSeconds=1` on a quiet demo market | `QUOTE_STALE` |
 | T2.18 | Modification errors | Enable trailing on a broker with a freeze level | `SL management skipped: … freeze level`, no error loop (2 s throttle) |
 | T2.19 | Real account lock | Real account, FULL_AUTO, `EnableLiveTrading=false` | dashboard `LOCKED`, alerts with `(LIVE EXECUTION LOCKED)`, zero orders |
-| T2.20 | Deposit/withdrawal | Demo deposit during the day | `External cash flow` log; baseline adjusted; no false halt |
+| T2.20 | Deposit/withdrawal | Demo deposit during the day | `Deposits/withdrawals since the baseline` log; Day P/L unchanged; no halt |
+| T2.21 | Start right after account login / new demo account (v1.20) | Attach the robot, then log into a fresh demo with a deposit | Panel shows `waiting for account data` until the first tick; baseline log shows the real equity; no false halt |
+| T2.22 | Scalper Pro exits (v1.20) | Demo, Scalper Pro, 1 day | log lines `SCALPER exit: … beyond EMA14`, `only xR after 10 bars`, `modified (break-even/trailing)` appear and match the chart |
+| T2.23 | Loss-streak pause (v1.20) | Demo or tester, Scalper Pro | after 3 losses in a row: `LOSS_STREAK_PAUSE` until +60 min; panel shows `PAUSED->hh:mm` |
 
 ## T3 — Research backtests (performance)
 
@@ -91,6 +94,8 @@ period (trend, range, high/low volatility) from the monthly table.
 | D | `Backtest_D_BreakEven.set` | + break-even at 1R |
 | X | `Backtest_X_Crossover.set` | **different strategy**: CROSSOVER scalper, every M1 cross, SL 1.5 ATR, TP 1R, unlimited trades |
 | X-T | `Backtest_X_CrossTrend.set` | X + only crosses in the M5 trend direction |
+| S | `Backtest_S_ScalperPro.set` | **Scalper Pro** (§18): crosses + continuations, filters, BE/stale/EMA exits, 1R |
+| S-noM5 | `Backtest_S_ScalperPro_NoM5.set` | S without the M5 trend filter (more trades) |
 
 **Metrics (extended report + MT5 report):** total trades, win rate, net profit, profit factor,
 max equity drawdown, average win, average loss, average realised R, expectancy, average and

@@ -2,3 +2,4 @@
 *.ini -text
 *.mq5 text eol=lf
 *.ex5 binary
+*.mqh text eol=lf

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generate MT5 .set preset files for ALB_FOREX_EMA_SCALPER_EA.
 
-Defaults are parsed from the EA source so presets never drift from the code.
+Defaults are parsed from the shared EA core (ALB_FOREX_EMA_CORE.mqh), resolving the
+AFX_DEF_* macros to the baseline robot's defaults, so presets never drift from the code.
 Each preset only overrides the inputs that define its research variant.
 Output: UTF-16 LE with BOM and CRLF line endings (the format MT5 writes itself).
 
@@ -13,33 +14,41 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-SRC = os.path.join(ROOT, "ALB_FOREX_EMA_SCALPER_EA.mq5")
+SRC = os.path.join(ROOT, "ALB_FOREX_EMA_CORE.mqh")
 OUT = os.path.join(ROOT, "presets")
 
 ENUM_VALUES = {
     "AFX_FULL_AUTO": "0", "AFX_ALERT_ONLY": "1",
     "AFX_CONFIRM_SAME_CANDLE": "0", "AFX_CONFIRM_NEXT_CANDLE": "1",
     "AFX_NEWS_HIGH_ONLY": "0", "AFX_NEWS_MEDIUM_HIGH": "1",
-    "AFX_ENTRY_PULLBACK": "0", "AFX_ENTRY_CROSSOVER": "1",
+    "AFX_ENTRY_PULLBACK": "0", "AFX_ENTRY_CROSSOVER": "1", "AFX_ENTRY_SCALPER": "2",
+    "AFX_LOSS_ACCOUNT": "0", "AFX_LOSS_THIS_EA": "1",
     "PERIOD_M1": "1", "PERIOD_M5": "5", "PERIOD_M15": "15",
 }
 
 INPUT_RE = re.compile(r'^input\s+(\w+)\s+(Inp\w+)\s*=\s*(.+?);\s*//\s*(.*)$')
+DEFINE_RE = re.compile(r'^#define\s+(AFX_DEF_\w+)\s+(.+?)\s*$')
 
 
 def parse_defaults():
     defaults = []
+    macros = {}
     with open(SRC, encoding="ascii") as fh:
-        for line in fh:
-            m = INPUT_RE.match(line.strip())
-            if not m:
-                continue
-            _type, name, value, _label = m.groups()
-            value = value.strip()
-            if value.startswith('"') and value.endswith('"'):
-                value = value[1:-1]
-            value = ENUM_VALUES.get(value, value)
-            defaults.append((name, value))
+        lines = fh.readlines()
+    for line in lines:
+        m = DEFINE_RE.match(line.strip())
+        if m and m.group(1) not in macros:
+            macros[m.group(1)] = m.group(2).strip()
+    for line in lines:
+        m = INPUT_RE.match(line.strip())
+        if not m:
+            continue
+        _type, name, value, _label = m.groups()
+        value = macros.get(value.strip(), value.strip())
+        if value.startswith('"') and value.endswith('"'):
+            value = value[1:-1]
+        value = ENUM_VALUES.get(value, value)
+        defaults.append((name, value))
     if not defaults:
         sys.exit("no inputs parsed from " + SRC)
     return defaults
@@ -52,6 +61,16 @@ BACKTEST = {
     "InpEnableAlerts": "false",
     "InpWriteJournalCsv": "true",
     "InpWriteTesterReport": "true",
+}
+
+# SCALPER PRO: same settings as the ALB_FOREX_SCALPER_PRO robot (own magic number)
+SCALPER_PRO = {
+    "InpEntryMode": "2",
+    "InpMaxTradesPerDay": "0",
+    "InpRewardRisk": "1.0",
+    "InpEnableFlatEMAFilter": "true",
+    "InpMagicNumber": "81420262",
+    "InpOrderComment": "ALBFX_SCP",
 }
 
 SCALPER = {
@@ -75,6 +94,11 @@ PRESETS = {
     "Backtest_X_CrossTrend": dict(BACKTEST, **SCALPER, InpCrossUseTrendFilter="true"),
     "Demo_Scalper": dict({"InpTradingMode": "0", "InpEnableLiveTrading": "false",
                           "InpEnableNewsFilter": "true"}, **SCALPER),
+    # SCALPER PRO (v1.20)
+    "Backtest_S_ScalperPro": dict(BACKTEST, **SCALPER_PRO),
+    "Backtest_S_ScalperPro_NoM5": dict(BACKTEST, **SCALPER_PRO, InpScTrendFilter="false"),
+    "Demo_ScalperPro": dict({"InpTradingMode": "0", "InpEnableLiveTrading": "false",
+                             "InpEnableNewsFilter": "true"}, **SCALPER_PRO),
     "Demo_FullAuto": {"InpTradingMode": "0", "InpEnableLiveTrading": "false",
                       "InpEnableNewsFilter": "true"},
     "AlertOnly": {"InpTradingMode": "1", "InpEnableNewsFilter": "true"},

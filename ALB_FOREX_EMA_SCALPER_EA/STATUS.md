@@ -1,6 +1,6 @@
-# STATUS — ALB_FOREX_EMA_SCALPER_EA
+# STATUS — ALB FOREX EMA 8/14 EAs (baseline + Scalper Pro)
 
-**Version:** 1.10 · **Updated:** 2026-11-09 · **Readiness: INCOMPLETE**
+**Version:** 1.20 · **Updated:** 2026-11-10 · **Readiness: INCOMPLETE**
 
 > Read this file first when resuming work. It separates what is implemented, what is verified
 > with evidence, and what is still open. Never upgrade a status without evidence in `reports/`.
@@ -9,119 +9,111 @@
 
 | Gate | Status |
 |---|---|
-| Source implemented | ✅ done |
-| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.10) — MetaEditor build 6308, `reports/compile/2026-11-09_v1.10_compile.log` |
-| Self-tests pass (80 checks) | ✅ **VERIFIED** (v1.10) — 80 passed, 0 failed in MT5 build 6308, `reports/selftest/2026-11-09_v1.10_selftest_experts.log` |
-| Functional backtests T1 | ⬜ not completed — first owner run (Lirunex demo, XAUUSD.std M1, 2026.10.01–10.05, v1.00) showed the BUY drift defect fixed in v1.01; rerun with v1.01 |
+| Source implemented | ✅ done — two robots over one core (`ALB_FOREX_EMA_CORE.mqh`) |
+| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.20, both robots) — `reports/compile/2026-11-10_v1.20_compile.log` |
+| Self-tests pass (105 checks) | ✅ **VERIFIED** (v1.20, both robots) — `reports/selftest/2026-11-10_v1.20_selftest_experts.log` |
+| Functional backtests T1 | ⬜ not done — the owner's runs so far: see "Test results" |
 | Edge cases T2 | ⬜ not run |
-| Research backtests T3 (in/out-of-sample) | ⬜ not run — **no performance data exists** |
-| Demo forward test T4 | ⬜ not run |
-| **Overall** | **INCOMPLETE** — compiles and pure logic is self-tested, but no trading test yet; not DEMO READY until T1 passes; not a LIVE CANDIDATE |
+| Research backtests T3 (in/out-of-sample) | ⬜ not run — **no backtest performance data exists** |
+| Demo forward test T4 | 🔶 started by the owner (IC Markets demo, 2026-11-10) — tiny sample, see below |
+| **Overall** | **INCOMPLETE** — compiled and self-tested; not DEMO READY until T1 passes; not a LIVE CANDIDATE |
 
-## Completed implementation (v1.00 + v1.01 fix + v1.10 CROSSOVER mode)
+## Robots
 
-- **v1.10:** CROSSOVER scalper entry mode (every M1 EMA 8/14 cross, ATR stop, TP 1R in presets,
-  opposite-cross exit, optional M5 trend filter, unlimited trades/day). See STRATEGY_SPEC §17.
+| File | Opens in | Magic |
+|---|---|---|
+| `ALB_FOREX_SCALPER_PRO.ex5` | SCALPER PRO (STRATEGY_SPEC §18), unlimited trades, 1R | 81420262 |
+| `ALB_FOREX_EMA_SCALPER_EA.ex5` | PULLBACK baseline (§4–§9), max 5/day, 1.5R | 81420261 |
 
-All items of the master prompt Phases 1–6 are implemented in `ALB_FOREX_EMA_SCALPER_EA.mq5`:
+## Completed implementation
 
-- Signal engine: M5 closed-bar EMA 8/14 trend, M1 band touch, Mode A / Mode B, optional M1 alignment.
-- Closed-candle-only evaluation, once per M1 bar, M5 closed-bar synchronisation, stale/gap rejection.
-- Filters: flat-EMA (separation/slope, ATR-normalised, independent toggles), spread/SL ratio,
-  absolute spread (off), quote validity/age, entry drift, news (live calendar, tester CSV,
-  fail-closed, export), optional session window, broker trade session, symbol trade mode.
-- Structural SL from confirmed unbroken 2/2 pivots, ATR buffer, SELL spread compensation,
-  min/max distance, stops level, tick-grid rounding.
-- 1.5R TP rounded away from entry, R:R re-check, TP re-anchored to the actual fill.
-- Equity-risk sizing via `OrderCalcProfit` (+ slippage, commission), floor to step, min-lot skip,
-  volume max/limit/cap, margin check, `OrderCheck`, daily-budget pre-check.
-- Daily equity guard with cash-flow-adjusted baseline, persistence + reconstruction after restart,
-  optional emergency close.
-- Max entries/day (history-reconstructed), one position per symbol, max open positions,
-  duplicate-signal prevention (persisted), netting foreign-position protection, hedging magic isolation.
-- Execution: filling-mode selection, return-code verification, position reconciliation,
-  partial fills, missing-SL protection, single controlled requote retry, no resend on unknown result.
-- FULL_AUTO / ALERT_ONLY with real-money lock (`EnableLiveTrading`).
-- Optional break-even / trailing / time exit (off by default).
-- Diagnostics: rejection codes, CSV journal, dashboard, extended tester report with all 16 metrics,
-  74 self-tests.
+- **v1.20** (2026-11-10, owner request "more trades, but valuable ones; get in and out fast"):
+  - SCALPER PRO entry mode: fresh M1 crosses + trend-continuation pullbacks (max 3 per leg), M5
+    trend alignment, momentum candle, EMA14 slope, ATR-vs-spread and ATR-spike filters, stop behind
+    the last 5 candles (0.8–2.5 ATR), 1R target, break-even at +0.6R, slow-EMA close exit, stale-trade
+    exit, cooldown after a loss, pause after 3 losses in a row, optional day target.
+  - **Daily-loss model rewritten** (false-halt fix): loss = −(realised trading P/L since the baseline
+    + change of floating P/L); deposits/withdrawals inferred from the balance and used only to scale
+    the %; baseline set on the first tick (synchronised account data); fresh history before any halt;
+    state version check; new option *Daily loss measured on: whole account / this robot only*.
+  - Dashboard: active strategy shown on line 3, day P/L in % and money, robot's trades today
+    (closed, wins, losses, net, loss streak, pause), 63-character label limit respected.
+  - Separate Scalper Pro robot file with its own defaults and magic number.
+  - Runner: asks for the gold symbol name, installs all robot files, tests S_ScalperPro,
+    S_ScalperPro_NoM5, X_Crossover, A_Baseline.
+- **v1.10:** CROSSOVER mode (every M1 cross, ATR stop) — §17.
+- **v1.01:** BUY-only entry-drift bias fixed.
+- **v1.00:** all master-prompt Phases 1–6: signal engine, filters, structural SL, 1.5R TP,
+  equity-risk sizing, daily guard, trade limits, execution engine with reconciliation,
+  FULL_AUTO/ALERT_ONLY with real-money lock, diagnostics, extended tester report.
 
 ## Verified features
 
 | What | Evidence | Scope |
 |---|---|---|
-| Presets contain every EA input with source defaults | `tools/make_presets.py` parses 78 inputs from the source | presets only |
-| Source file is plain ASCII, single copy of every function | checked in this session | text only |
-| **Compiles: 0 errors, 0 warnings** | v1.00: `reports/compile/2026-11-08_v1.00_compile.log`; v1.01: `reports/compile/2026-11-09_v1.01_compile.log` (MetaEditor64 5.0.0.6308) | compilation only |
-| **74 self-tests pass at runtime** (v1.01; v1.00: 72/72) (trend, band touch, Mode A/B patterns, swing detection, tick rounding, TP, volume sizing, spread ratio, entry drift, flat filter, day boundary, sessions, news parsing) | `reports/selftest/2026-11-09_v1.01_selftest_experts.log` | pure logic functions only |
-| EA initialises and deinitialises cleanly on a live chart; preset file is read (79 inputs) | same log + terminal journal | EURUSD sample chart, no broker account, no ticks |
-| EA runs on a real broker demo: dashboard live, M5 trend read, **live news calendar verified** ("LIVE calendar OK, 6 relevant events"), signal evaluation and rejection codes active | owner screenshot 2026-11-09 (Lirunex demo, XAUUSD.std, hedging, v1.00) | no trade observed yet |
+| **Both robots compile: 0 errors, 0 warnings** | `reports/compile/2026-11-10_v1.20_compile.log` (MetaEditor64 5.0.0.6308; SHA-256 of all sources and binaries inside) | compilation only |
+| **105 self-tests pass at runtime, both robots** — patterns, swings, rounding, TP, sizing, spread, drift, flat filter, day boundary, sessions, news parsing, crossover, scalper leg/momentum/stop/break-even/stale/EMA exit/loss streak, daily-loss model incl. the deposit cases | `reports/selftest/2026-11-10_v1.20_selftest_experts.log` | pure logic functions only |
+| Both robots start and stop cleanly; Scalper Pro opens in SCALPER PRO mode, magic 81420262, unlimited trades; presets are read (108 inputs) | same log | EURUSD sample chart, no broker account, no ticks |
+| Earlier versions: compile + self-tests v1.00 (72/72), v1.01 (74/74), v1.10 (80/80) | `reports/compile/`, `reports/selftest/` | history |
+| Live calendar news filter works on a broker demo | owner screenshots 2026-11-09 (Lirunex) and 2026-11-10 (IC Markets) | live path only |
 
-**Not yet verified:** order execution, SL/TP placement, sizing against a real contract,
-daily limit, news filter, and any trading performance. The self-tests cover the pure decision
-functions only; the terminal-dependent code (orders, history, calendar) has not run with ticks.
+**Not yet verified:** Scalper Pro trading behaviour (entries, BE/stale/EMA exits, cooldown/pause) on
+ticks, the new daily-loss model on a live account, and any backtest performance.
 
 ## Compilation status
 
-**VERIFIED — 0 errors, 0 warnings** (v1.00 and v1.01).
-
-- Compiler: MetaEditor64.exe FileVersion **5.0.0.6308** (official MetaQuotes installer, signed by
-  MetaQuotes Ltd, installer SHA-256 `a879492d…4c93`), run under WineHQ 11.0 in a Linux cloud sandbox
-  with the owner's approval. Ubuntu's Wine 9.0 could not run MetaEditor (false "debugger detected").
-- v1.10 (current): `Result: 0 errors, 0 warnings, 2929 ms elapsed`; source SHA-256
-  `beb278e2f72110a9e925d2eb72291b1b64ab4b6c79c833a816a68659a1aa808a`; `.ex5` SHA-256
-  `f103dfc645dd421e6fd5116292edcec6b59fbac37d829904b72de3deabb337e3`; log `reports/compile/2026-11-09_v1.10_compile.log`
-- v1.01: `Result: 0 errors, 0 warnings, 3020 ms elapsed`; source SHA-256
-  `6871315a2c70e03b77fb964a3819c0a5ee9531bba0b746652bde0d835481e4c1`; `.ex5` SHA-256
-  `c05b0f258af414de7db063ce4689a757ddb58005ba375b357a05c864a4263ecc`; log `reports/compile/2026-11-09_v1.01_compile.log`
-- v1.00: `Result: 0 errors, 0 warnings`; log `reports/compile/2026-11-08_v1.00_compile.log`
-- Recompiling on your own MetaEditor (F7) is still recommended; any newer build should also report 0/0.
+**VERIFIED — 0 errors, 0 warnings** for every version (v1.00, v1.01, v1.10, v1.20).
+Compiler: MetaEditor64.exe **5.0.0.6308** (official MetaQuotes installer, signed by MetaQuotes Ltd),
+under WineHQ 11.0 in a Linux cloud sandbox with the owner's approval. Hashes in the compile logs.
+Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE.mqh` next to the `.mq5` files.
 
 ## Test results
 
-- **T0.1 compile:** PASSED (0 errors, 0 warnings) — v1.00 and v1.01.
-- **T0.2 self-tests:** PASSED — v1.00 72/72, v1.01 74/74, v1.10 80/80 — MT5 build 6308, 2026-11-09.
-- **Owner one-click run #1 (v1.01, 2026-11-09 16:11):** all 4 variants `NO REPORT` after ~6 s — MT5 did not start
-  the tester; no reason captured. Runner improved to report MT5's reason and retry with the account.
-- **Owner demo run (v1.00, Lirunex XAUUSD.std):** EA live, news calendar verified, evaluations logged.
-- **Owner tester run (v1.00, XAUUSD.std M1, 2026.10.01–10.05, visual):** no trades visible in the shown window.
-  Review found a defect: BUY drift was measured on the Ask, so the ~0.20 USD spread alone used up
-  most of the 0.20 × ATR(M1) ≈ 0.21–0.28 USD drift limit → BUYs almost always rejected (`ENTRY_DRIFT`),
-  SELLs not. **Fixed in v1.01** (drift on Bid basis). Full journal of that run not yet reviewed.
-- **Strategy Tester:** NOT RUN. Attempted on the terminal's offline EURUSD sample data as a
-  functional check; MT5 refused: `tester not started because the account is not specified`. A broker
-  (demo) account is required, which this sandbox does not have.
-- **No backtest, forward test or performance statistics exist.**
+- **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.20: 0/0 and 105/105, both robots).
+- **Owner demo run, 2026-11-10 (IC Markets demo 53134676, hedging, XAUUSD M1, v1.10):**
+  - The robot ran in **PULLBACK** mode with default inputs (panel: `Confirm: A same candle`, `RR 1:1.50`,
+    `Entries today 3/5`), not in the scalper mode the owner intended → reason for the low trade count.
+    v1.20 adds the separate Scalper Pro robot so the mode can not be mixed up.
+  - 3 trades, all SELL 0.01, all winners: +5.97, +6.72, +4.92 = **+17.61** on a 1 000 deposit.
+    Sample far too small to mean anything.
+  - Panel showed **`Day P/L −7.37% HALTED`** although the robot's own trades were +17.61. Cause not
+    proven (no Experts log). Two candidates: (a) other trades on the account, (b) the v1.00–v1.10
+    baseline counting the 1 000 deposit (booked at 18:00:46) on top of a baseline captured while MT5
+    was still loading the new account. (b) is a real weakness of the old model and is **fixed in
+    v1.20**; (a) is by design in *whole account* scope — use *this robot only* if other trades share
+    the account.
+- **Owner one-click run #1 (v1.01, 2026-11-09):** all variants `NO REPORT` (MT5 did not start the
+  tester; account not used). Runner since then reports MT5's reason and retries with the account.
+- **Owner tester run (v1.00, XAUUSD.std M1, 2026.10.01–10.05, visual):** exposed the BUY drift
+  defect (fixed in v1.01).
+- **Strategy Tester in the sandbox:** impossible — MT5 requires a broker account.
+- **No backtest performance statistics exist.**
 
 ## Incomplete / unverified
 
-- All functional, edge-case, research and demo tests (TEST_PLAN T1–T4).
-- News filter: live calendar path, CSV export and tester CSV path are untested. Calendar time
-  stamps for past events may reflect the broker's current UTC offset (DST) — verify a few known
-  events (e.g. NFP) in the exported CSV before relying on it.
-- Emergency close on daily limit: implemented, not yet tested (preset `Test_DailyLimit_Emergency.set`).
-- Flat-filter, drift, buffer and min/max SL thresholds are placeholders, not calibrated.
-- `EstimatedCommissionPerLot` (7.0) must be set to the real broker value.
+- All functional, edge-case, research tests (TEST_PLAN T1–T3), especially for SCALPER PRO.
+- New daily-loss model on a live account with deposits (TEST_PLAN T2.20, T2.21).
+- News CSV export/tester path; emergency close (`Test_DailyLimit_Emergency.set`).
+- All thresholds (pullback filters, Scalper Pro filters and exits) are placeholders, not calibrated.
+- `EstimatedCommissionPerLot` (7.0) must match the broker (IC Markets raw ≈ 7 per lot round trip).
 
 ## Known defects / limitations
 
-- Fixed in v1.01: BUY-only entry-drift bias (spread counted as drift for BUY). No other verified defects.
-- `Last:` dashboard line shows the most recent evaluated setup only; use the Experts log / journal CSV for history.
-- `MaxTradesPerDay` in ALERT_ONLY counts alerts; position-based rules cannot be simulated there
-  (no virtual positions).
+- No open verified defects. Fixed: v1.01 BUY drift bias; v1.20 deposit/baseline false-halt risk and
+  dashboard text cut at 63 characters (MT5 label limit).
+- `MaxTradesPerDay` in ALERT_ONLY counts alerts (no virtual positions).
 - If `TradingSymbol` differs from the chart symbol, signals are evaluated only on chart ticks.
-- Strategy Tester remote/cloud agents cannot read the news CSV from `Common\Files`; use local agents.
-- The daily guard is equity-based and not a guaranteed loss cap.
+- Tester remote/cloud agents cannot read the news CSV from `Common\Files`; use local agents.
+- The daily guard is not a guaranteed loss cap (gaps, slippage).
+- Scalper Pro's leg counter reads deal history for continuation candidates (once per candidate bar).
 
 ## Next required action
 
-1. ~~Compile~~ — done (0 errors, 0 warnings).
-2. ~~Self-tests~~ — done (v1.01: 74/74).
-3. **Owner action:** log in to MT5 (Lirunex demo, Save password), close MT5, double-click `RUN_BACKTESTS.bat`
-   (default: X_Crossover, X_CrossTrend, A_Baseline; in-sample 2026.04.01–08.31 on XAUUSD.std), send the zip. Script dry-run and full simulation tested; the generated
-   tester `.ini` was accepted by real MT5 build 6308. Equivalent manual route: run TEST_PLAN **T1** functional checks on 1–2 weeks of real-tick data, especially T1.1 (look-ahead),
-   T1.4 (TP), T1.5 (sizing), T1.11 (daily limit + emergency close).
-4. Only then run **T3** variants A–D with identical dates and an untouched out-of-sample period,
-   and store reports in `reports/`.
-5. Decide per TEST_PLAN decision rules: DEMO READY / RESEARCH NO-GO. If out-of-sample results are
-   negative or insufficient, mark the strategy **NOT VALIDATED** and continue demo research only.
+1. **Owner:** on the IC Markets demo, close the old robot and attach **`ALB_FOREX_SCALPER_PRO`** to
+   the XAUUSD M1 chart (panel line 3 must read `Entry: SCALPER PRO`). If other robots or manual
+   trades use the same account, set *Daily loss measured on = this robot only*.
+2. **Owner:** run `RUN_BACKTESTS.bat` (symbol `XAUUSD` for IC Markets) and send the zip from the
+   Desktop — first real backtest data for S_ScalperPro vs S_ScalperPro_NoM5 vs X_Crossover vs A_Baseline.
+3. Analyse: trades/day, win rate, average R, costs, rejection funnel; adjust one parameter at a time
+   on in-sample only; confirm once on 2026.09.01 → today (out-of-sample).
+4. Decide per TEST_PLAN rules: DEMO READY / RESEARCH NO-GO. No live trading before that.

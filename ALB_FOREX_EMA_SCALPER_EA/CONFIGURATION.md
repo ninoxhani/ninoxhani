@@ -1,4 +1,4 @@
-# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.10
+# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.20
 
 The MT5 inputs dialog shows the **label** (text after `//` in the source). Preset `.set` files
 and the tester `.ini` use the **variable name** (`Inp…`). Both are listed below.
@@ -9,6 +9,19 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 
 > Defaults marked *placeholder* were chosen as safe starting points. They are **not**
 > optimised or validated values.
+
+**Two robot files, same inputs, different defaults (v1.20):**
+
+| Input | `ALB_FOREX_EMA_SCALPER_EA` (baseline) | `ALB_FOREX_SCALPER_PRO` |
+|---|---|---|
+| `InpEntryMode` | PULLBACK (0) | SCALPER PRO (2) |
+| `InpMagicNumber` | 81420261 | 81420262 |
+| `InpMaxTradesPerDay` | 5 | 0 (unlimited) |
+| `InpRewardRisk` | 1.5 | 1.0 |
+| `InpEnableFlatEMAFilter` | false | true |
+| `InpOrderComment` | ALBFX_EMA | ALBFX_SCP |
+
+Everything else below has the same default in both.
 
 ## General
 
@@ -28,7 +41,7 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | SlowEMA | `InpSlowEMA` | 14 | period, must be > FastEMA |
 | TrendTF | `InpTrendTF` | M5 | must be higher than EntryTF |
 | EntryTF | `InpEntryTF` | M1 | |
-| EntryMode | `InpEntryMode` | PULLBACK (0) | 0 = PULLBACK baseline, 1 = CROSSOVER scalper (every M1 EMA cross, STRATEGY_SPEC §17) |
+| EntryMode | `InpEntryMode` | see table above | 0 = PULLBACK baseline, 1 = CROSSOVER (every M1 EMA cross, §17), 2 = SCALPER PRO (§18) |
 | ConfirmationMode | `InpConfirmationMode` | SAME_CANDLE (0) | PULLBACK only: 0 = Mode A, 1 = Mode B (experimental). Never mix in one run. |
 | RequireM1EMAAlignment | `InpRequireM1EMAAlignment` | false | entry-TF EMA8 above/below EMA14 in trade direction |
 | Mode B close-through invalidation | `InpModeBInvalidateOnCloseThrough` | true | Mode B only |
@@ -38,6 +51,35 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | CROSSOVER trend filter | `InpCrossUseTrendFilter` | false | true = only crosses in the M5 trend direction |
 | CROSSOVER stop | `InpCrossSLATR` | 1.5 | × ATR(M1) from Bid (BUY) / Ask (SELL) — *placeholder* |
 | CROSSOVER close on opposite | `InpCrossCloseOnOpposite` | true | an opposite cross closes the open EA position |
+
+## Scalper Pro (`EntryMode = SCALPER PRO`, STRATEGY_SPEC §18)
+
+| Label | Variable | Default | Unit / notes |
+|---|---|---|---|
+| M5 trend filter | `InpScTrendFilter` | true | trade only in the M5 EMA 8/14 direction |
+| Cross entries | `InpScUseCrossEntries` | true | fresh M1 EMA cross, candle closes beyond both EMAs |
+| Continuation entries | `InpScUseContinuation` | true | pullback into the M1 EMA band and close back beyond EMA8 |
+| Max entries per leg | `InpScMaxEntriesPerLeg` | 3 | per M1 EMA leg; 0 = no limit |
+| Leg lookback | `InpScLegLookback` | 120 | M1 bars scanned for the leg start |
+| Min body ratio | `InpScMinBodyRatio` | 0.40 | signal candle body / range — *placeholder* |
+| Slope bars | `InpScSlopeBars` | 3 | M1 bars for the EMA14 slope |
+| Min slope | `InpScMinSlopeATR` | 0.10 | × ATR(M1), continuations only — *placeholder* |
+| ATR vs spread | `InpScMinATRSpread` | 5.0 | ATR(M1) ≥ N × spread; 0 = off — *placeholder* |
+| Long ATR period | `InpScATRLongPeriod` | 100 | M1 bars |
+| Spike filter | `InpScMaxATRRatio` | 2.5 | skip when ATR(14)/ATR(100) > N; 0 = off — *placeholder* |
+| Stop bars | `InpScSLBars` | 5 | stop behind the extreme of the last N closed M1 bars |
+| Stop buffer | `InpScSLBufferATR` | 0.15 | × ATR(M1) |
+| Min stop | `InpScMinSLATR` | 0.8 | × ATR(M1); tighter structural stops are widened to it — *placeholder* |
+| Max stop | `InpScMaxSLATR` | 2.5 | × ATR(M1); farther = trade skipped |
+| Break-even trigger | `InpScBreakEvenR` | 0.6 | R; 0 = off — *placeholder* |
+| Break-even lock | `InpScBreakEvenLockR` | 0.10 | R locked when moving to break-even |
+| Stale bars | `InpScStaleBars` | 10 | close a trade that has not progressed after N bars; 0 = off |
+| Stale min progress | `InpScStaleMinR` | 0.25 | R required by then |
+| Slow-EMA exit | `InpScExitOnSlowEMAClose` | true | close when a candle closes beyond EMA14 against the trade |
+| Cooldown | `InpScCooldownBars` | 3 | M1 bars after a losing trade; 0 = off |
+| Loss streak | `InpScMaxConsecLosses` | 3 | pause after N losses in a row; 0 = off |
+| Pause | `InpScPauseMinutes` | 60 | minutes |
+| Day target | `InpScDailyTargetPct` | 0 | stop new entries at +N % day profit; 0 = off |
 
 ## Market filters
 
@@ -98,6 +140,7 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 |---|---|---|---|
 | RiskPercent | `InpRiskPercent` | 0.5 | % of current equity per trade. Hard limit 5.0. |
 | MaxDailyLossPercent | `InpMaxDailyLossPercent` | 2.0 | % of the daily equity baseline. Hard limit 20.0. |
+| Daily loss scope | `InpDailyLossScope` | Whole account (0) | 0 = all trades on the account count; 1 = only this robot's trades (use when other robots/manual trades share the account) |
 | MaxTradesPerDay | `InpMaxTradesPerDay` | 5 | executed entries per broker day (alerts in ALERT_ONLY); **0 = unlimited** |
 | MaxOpenPositions | `InpMaxOpenPositions` | 1 | across all symbols for this magic; one per symbol is always enforced |
 | EstimatedCommissionPerLot | `InpEstimatedCommissionPerLot` | 7.0 | account currency per 1.0 lot, **round trip**. Set to your broker's value. |
@@ -121,7 +164,7 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | Push notifications | `InpEnablePushNotifications` | false | live only; needs MetaQuotes ID in terminal settings |
 | Journal CSV | `InpWriteJournalCsv` | true | `Common\Files\ALBFX_EMA_SCALPER_Journal_<symbol>_<magic>_<TESTER|LIVE>.csv` |
 | Extended tester report | `InpWriteTesterReport` | true | `Common\Files\ALBFX_EMA_SCALPER_Report_<symbol>_<ModeA|ModeB>.txt` + journal log |
-| Run self-tests | `InpRunSelfTests` | false | runs 80 logic checks in `OnInit`; the EA refuses to start if any fail |
+| Run self-tests | `InpRunSelfTests` | false | runs 105 logic checks in `OnInit`; the EA refuses to start if any fail |
 
 ## Rejection codes (log, journal, report)
 
@@ -131,7 +174,11 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | `TREND_TF_NOT_SYNCED` | M5 series not rolled forward yet |
 | `STALE_SIGNAL` | evaluation too late after bar open, or market gap |
 | `NO_TREND` / `NO_BAND_TOUCH` / `NO_EMA_CROSS` | no setup (not logged unless `InpLogNoSetupBars`) |
-| `CROSS_AGAINST_TREND` | CROSSOVER with trend filter: cross against the M5 trend |
+| `AGAINST_M5_TREND` | CROSSOVER/SCALPER with trend filter: signal against the M5 trend |
+| `WEAK_MOMENTUM_CANDLE` | SCALPER: small body, wrong colour, or cross candle not beyond both EMAs |
+| `VOLATILITY_TOO_LOW` / `VOLATILITY_SPIKE` | SCALPER: ATR too small for the spread / news-like spike |
+| `MAX_ENTRIES_PER_LEG` | SCALPER: continuation limit for the current M1 leg reached |
+| `COOLDOWN_AFTER_LOSS` / `LOSS_STREAK_PAUSE` / `DAILY_TARGET_REACHED` | SCALPER damage control / day target |
 | `CANDLE_DIRECTION` / `CLOSE_VS_EMA8` / `SETUP_INVALIDATED` / `ENTRY_TF_EMA_ALIGNMENT` | touch occurred, confirmation failed |
 | `FLAT_EMA_SEPARATION` / `FLAT_EMA_SLOPE` | flat-EMA filter |
 | `SESSION_FILTER` / `MARKET_CLOSED` / `DIRECTION_NOT_ALLOWED` | time / symbol trade mode |
@@ -159,6 +206,9 @@ on a 3-digit quote 1 pt = 0.001), **ATR** = multiple of ATR(14) of the stated ti
 | `Backtest_X_Crossover.set` | CROSSOVER scalper: every M1 cross, SL 1.5 ATR, TP 1R, unlimited trades, news OFF |
 | `Backtest_X_CrossTrend.set` | same, only crosses in the M5 trend direction |
 | `Demo_Scalper.set` | CROSSOVER scalper for a demo account, news ON |
+| `Backtest_S_ScalperPro.set` | **SCALPER PRO** (same settings as the Scalper Pro robot), news OFF |
+| `Backtest_S_ScalperPro_NoM5.set` | SCALPER PRO without the M5 trend filter (more trades) |
+| `Demo_ScalperPro.set` | SCALPER PRO for a demo account, news ON (magic 81420262) |
 | `Demo_FullAuto.set` | demo account forward test, news ON |
 | `AlertOnly.set` | signals only |
 

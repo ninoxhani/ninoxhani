@@ -1,17 +1,29 @@
-# ALB FOREX — EMA 8/14 Scalper EA (MT5)
+# ALB FOREX — EMA 8/14 EAs for XAUUSD (MT5)
 
-`ALB_FOREX_EMA_SCALPER_EA` is an **experimental research** Expert Advisor for **XAUUSD** on
-MetaTrader 5:
+Two **experimental research** Expert Advisors for **XAUUSD** on MetaTrader 5, built from one
+shared core:
+
+| Robot | Use it for | Opens with |
+|---|---|---|
+| **`ALB_FOREX_SCALPER_PRO`** | scalping: many quick trades | SCALPER PRO mode, unlimited trades, 1R target, magic 81420262 |
+| `ALB_FOREX_EMA_SCALPER_EA` | the original pullback strategy | PULLBACK mode, max 5 trades/day, 1.5R, magic 81420261 |
+
+**Scalper Pro (v1.20):** enters on fresh M1 EMA 8/14 crosses **and** on pullbacks to the EMA band
+while the M1 trend lasts (max 3 per leg), only with the M5 trend, a strong candle, enough
+volatility for the spread and no news spike. Stop behind the last 5 candles, 1R target,
+break-even at +0.6R, exit when a candle closes back through EMA14, exit trades that go nowhere
+after 10 bars, 3-bar cooldown after a loss, 60-minute pause after 3 losses in a row.
+
+**Pullback baseline:**
 
 - **Trend:** EMA 8/14 on the latest **closed** M5 candle.
 - **Entry:** a closed M1 candle touches the EMA 8/14 band and confirms in the trend direction.
 - **Exit:** structural swing stop-loss and a fixed **1.5R** take-profit.
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
-- **v1.10 scalper mode (`EntryMode = CROSSOVER`):** enters on every M1 EMA 8/14 cross, ATR stop,
-  1R target, opposite cross closes the trade, no daily trade cap. Presets `Backtest_X_*`, `Demo_Scalper`.
+- Also available via `EntryMode`: `CROSSOVER` (v1.10, every M1 cross, simple ATR stop).
 
-> **Status: NOT VALIDATED.** Compiles with 0 errors / 0 warnings (MetaEditor build 6308) and passes
-> its 80 logic self-tests, but no
+> **Status: NOT VALIDATED.** Both robots compile with 0 errors / 0 warnings (MetaEditor build 6308)
+> and pass their 105 logic self-tests, but no
 > backtest has been run yet and there is no evidence of a
 > positive edge. Do not trade real money with it. See [STATUS.md](STATUS.md).
 
@@ -30,12 +42,15 @@ Supply & Demand EA, Tradivo ProShi, EAGLE or any TradingView indicator.
 
 ```
 ALB_FOREX_EMA_SCALPER_EA/
-├── ALB_FOREX_EMA_SCALPER_EA.mq5   EA source (single file, no external includes)
-├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled EA v1.10 (MetaEditor build 6308)
+├── ALB_FOREX_SCALPER_PRO.ex5      compiled Scalper Pro robot v1.20
+├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled baseline robot v1.20
+├── ALB_FOREX_SCALPER_PRO.mq5      Scalper Pro source (defaults only)
+├── ALB_FOREX_EMA_SCALPER_EA.mq5   baseline source (defaults only)
+├── ALB_FOREX_EMA_CORE.mqh         shared core: all strategy, risk and execution code
 ├── presets/                       .set files for each research variant and test
 ├── tests/                         Strategy Tester .ini configs (command-line backtests)
 ├── reports/                       put tester reports here (empty until tests are run)
-├── RUN_BACKTESTS.bat              one-click: runs variants A-D in MT5 and zips the results
+├── RUN_BACKTESTS.bat              one-click: runs the test variants in MT5 and zips the results
 ├── tools/run_backtests.ps1        the PowerShell script behind RUN_BACKTESTS.bat
 ├── tools/make_presets.py          regenerates presets from the source defaults
 └── *.md                           documentation
@@ -45,22 +60,24 @@ ALB_FOREX_EMA_SCALPER_EA/
 
 1. Open MetaTrader 5 → **File → Open Data Folder**.
 2. Go to `MQL5\Experts\` and create the folder `ALB_FOREX_EMA_SCALPER_EA`.
-3. Copy `ALB_FOREX_EMA_SCALPER_EA.mq5` into it:
-   `…\MQL5\Experts\ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_EMA_SCALPER_EA.mq5`
+3. Copy into it **all five** robot files: `ALB_FOREX_SCALPER_PRO.ex5`, `ALB_FOREX_EMA_SCALPER_EA.ex5`,
+   `ALB_FOREX_SCALPER_PRO.mq5`, `ALB_FOREX_EMA_SCALPER_EA.mq5`, `ALB_FOREX_EMA_CORE.mqh`.
+   (`RUN_BACKTESTS.bat` does this automatically.)
 4. Copy the files from `presets\` to `…\MQL5\Profiles\Tester\` (for the Strategy Tester).
+5. In MT5: *Navigator* → right-click *Expert Advisors* → **Refresh**.
 
 ## 2. Compile with MetaEditor
 
 1. In MT5 press **F4** (MetaEditor).
-2. Open `Experts\ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_EMA_SCALPER_EA.mq5`.
+2. Open `Experts\ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_SCALPER_PRO.mq5` (and/or `ALB_FOREX_EMA_SCALPER_EA.mq5`).
 3. Press **F7** (Compile). The *Errors* tab must show `0 errors, 0 warnings`.
-4. `ALB_FOREX_EMA_SCALPER_EA.ex5` is created next to the source.
+4. The `.ex5` is created next to the source. `ALB_FOREX_EMA_CORE.mqh` must be in the same folder.
 
 If the compiler reports anything, copy the full *Errors* tab text and send it back for a fix.
 
 Optional check: attach the EA with the `Test_SelfTests.set` preset (or set
 **Run built-in logic self-tests on start = true**). The *Experts* tab must show
-`[AFX-EMA][SELFTEST] 74 passed, 0 failed`.
+`[AFX-EMA][SELFTEST] 105 passed, 0 failed`.
 
 ## 3. Enable Algo Trading
 
@@ -73,9 +90,13 @@ Optional check: attach the EA with the `Test_SelfTests.set` preset (or set
 1. Open a chart of your broker's gold symbol (e.g. `XAUUSD`, `XAUUSD+`, `XAUUSD.ecn`,
    `XAUUSDm`). Use that exact symbol — the EA reads all contract data from the broker.
 2. Set the chart to **M1** (recommended; the EA always uses M5 and M1 internally).
-3. Drag the EA from *Navigator → Expert Advisors* onto the chart.
+3. Drag **`ALB_FOREX_SCALPER_PRO`** (scalper) or `ALB_FOREX_EMA_SCALPER_EA` (pullback) from
+   *Navigator → Expert Advisors* onto the chart. The panel's line 3 shows which strategy is active:
+   `Entry: SCALPER PRO …` for the scalper, `Confirm: A same candle …` for the pullback.
 4. Leave **TradingSymbol** empty (= chart symbol).
-5. Give each running instance its own **MagicNumber**.
+5. Give each running instance its own **MagicNumber** (the two robots already differ).
+6. If other robots or manual trades share the account, set **Daily loss measured on = this robot
+   only**; otherwise their losses also count towards the 2 % daily stop.
 
 ## 5. Choose FULL_AUTO or ALERT_ONLY
 
@@ -96,12 +117,13 @@ entries today, news-filter status, open position and the last evaluation result.
 1. Log in to your broker account in MT5 once with **Save password** ticked, then **close MT5**.
 2. Double-click **`RUN_BACKTESTS.bat`** in this folder. (If Windows SmartScreen warns:
    *More info → Run anyway*.)
-3. Wait. It runs X_Crossover (scalper), X_CrossTrend and A_Baseline one after another on `XAUUSD.std`, M1, real ticks,
-   2026.04.01 → 2026.08.31, deposit 10 000 USD. The first run also downloads tick data.
-   The PC must stay on.
+3. Type your gold symbol when asked (Enter = `XAUUSD`, e.g. IC Markets; Lirunex = `XAUUSD.std`).
+4. Wait. It runs S_ScalperPro, S_ScalperPro_NoM5, X_Crossover and A_Baseline one after another
+   on that symbol, M1, real ticks, 2026.04.01 → 2026.08.31, deposit 10 000 USD. The first run also
+   downloads tick data. The PC must stay on.
    If a run fails, the script prints MT5's own reason, stops, and (if MT5 did not use your broker
    account) lets you type your account number to retry. Your password must be saved in MT5.
-4. At the end a single file `ALBFX_Backtests_<date>.zip` appears on your Desktop with every
+5. At the end a single file `ALBFX_Backtests_<date>.zip` appears on your Desktop with every
    report, journal and log. Send that file for analysis.
 
 Other symbol or dates: `powershell -ExecutionPolicy Bypass -File tools\run_backtests.ps1 -Symbol XAUUSD -From 2026.04.01 -To 2026.08.31`.

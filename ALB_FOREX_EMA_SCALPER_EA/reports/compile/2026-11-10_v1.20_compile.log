@@ -1,0 +1,21 @@
+# MetaEditor compile log - v1.20 (two robots over one shared core)
+# Date: 2026-11-10 | MetaEditor64.exe FileVersion 5.0.0.6308 | WineHQ 11.0 on Ubuntu 24.04 (cloud sandbox)
+# SHA-256 4c1a6f83dd82c5d31516c1380a3228d5afec445ca096161bc66615707e75814b  ALB_FOREX_EMA_CORE.mqh
+# SHA-256 4e5e28d0fc1465d0af0be54ceb627c4fa159102edc5e95240b91ad736b6a2348  ALB_FOREX_EMA_SCALPER_EA.mq5
+# SHA-256 cc8d313ee1a3fedaf05e519136c22c260ff04ba2bb2543b24409d47c2b5a3a45  ALB_FOREX_SCALPER_PRO.mq5
+# SHA-256 873c171a157d603f774f3e87677a219caf263b3e4ae845bf1492047de19541a2  ALB_FOREX_EMA_SCALPER_EA.ex5
+# SHA-256 57ea98f0c1072ab3b895992cef7e9e9e5e1d8491dececb6f7124d81485258aa0  ALB_FOREX_SCALPER_PRO.ex5
+
+## ALB_FOREX_EMA_SCALPER_EA.mq5
+ALB_FOREX_EMA_SCALPER_EA.mq5 : information: compiling ALB_FOREX_EMA_SCALPER_EA.mq5
+ALB_FOREX_EMA_SCALPER_EA.mq5 : information: including ALB_FOREX_EMA_CORE.mqh
+ : information: generating code
+ : information: code generated
+Result: 0 errors, 0 warnings, 3064 ms elapsed, cpu='X64 Regular'
+
+## ALB_FOREX_SCALPER_PRO.mq5
+ALB_FOREX_SCALPER_PRO.mq5 : information: compiling ALB_FOREX_SCALPER_PRO.mq5
+ALB_FOREX_SCALPER_PRO.mq5 : information: including ALB_FOREX_EMA_CORE.mqh
+ : information: generating code
+ : information: code generated
+Result: 0 errors, 0 warnings, 3030 ms elapsed, cpu='X64 Regular'

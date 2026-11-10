@@ -4,9 +4,9 @@
   What it does (no MT5 clicks needed):
     1. Finds your MetaTrader 5 installation and data folder.
     2. Copies the EA (.ex5/.mq5) and the presets into MT5.
-    3. Runs the Strategy Tester once per variant, unattended. Default: X_Crossover (scalper, every
-       M1 EMA cross), X_CrossTrend (same, only with the M5 trend) and A_Baseline (pullback).
-       Others: -Variants B_NextCandle,C_FlatFilter,D_BreakEven
+    3. Runs the Strategy Tester once per variant, unattended. Default: S_ScalperPro (Scalper Pro),
+       S_ScalperPro_NoM5 (Scalper Pro without the M5 trend filter), X_Crossover (every M1 cross)
+       and A_Baseline (pullback). Others: -Variants X_CrossTrend,B_NextCandle,C_FlatFilter,D_BreakEven
     4. Collects every report, journal and log into ONE zip on your Desktop.
 
   Requirements:
@@ -20,12 +20,12 @@
   account) offers to retry with an account number you type. The password must be saved in MT5.
 #>
 param(
-    [string]   $Symbol   = "XAUUSD.std",
+    [string]   $Symbol   = "",
     [string]   $From     = "2026.04.01",
     [string]   $To       = "2026.08.31",
     [int]      $Deposit  = 10000,
     [int]      $Leverage = 100,
-    [string[]] $Variants = @("X_Crossover", "X_CrossTrend", "A_Baseline"),
+    [string[]] $Variants = @("S_ScalperPro", "S_ScalperPro_NoM5", "X_Crossover", "A_Baseline"),
     [string]   $AppData  = $env:APPDATA,
     [string]   $OutRoot  = [Environment]::GetFolderPath("Desktop"),
     [string]   $Login    = "",
@@ -38,6 +38,13 @@ $ErrorActionPreference = "Stop"
 # "-Variants A_Baseline,B_NextCandle" arrives as one string with -File: split it
 $Variants = @($Variants | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 $EaName  = "ALB_FOREX_EMA_SCALPER_EA"
+if (-not $Symbol) {
+    if ($DryRun) { $Symbol = "XAUUSD" }
+    else {
+        $ans = (Read-Host "Gold symbol name in your MT5 (Enter = XAUUSD; Lirunex = XAUUSD.std)").Trim()
+        $Symbol = if ($ans) { $ans } else { "XAUUSD" }
+    }
+}
 $Here    = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Project = Split-Path -Parent $Here
 
@@ -63,9 +70,9 @@ Say ("Symbol {0} | {1} -> {2} | deposit {3} USD | variants: {4}" -f $Symbol, $Fr
 
 # --- 1. project files ---------------------------------------------------------
 $ex5 = Join-Path $Project "$EaName.ex5"
-$mq5 = Join-Path $Project "$EaName.mq5"
 $presetDir = Join-Path $Project "presets"
-foreach ($f in @($ex5, $mq5, $presetDir)) { if (-not (Test-Path $f)) { Fail "missing project file: $f" } }
+foreach ($f in @($ex5, $presetDir)) { if (-not (Test-Path $f)) { Fail "missing project file: $f" } }
+$robotFiles = @(Get-ChildItem -Path $Project -File | Where-Object { $_.Extension -in @(".ex5", ".mq5", ".mqh") })
 
 # --- 2. find MT5: data folders that contain origin.txt -> install folder ------
 $termBase = Join-Path $AppData "MetaQuotes\Terminal"
@@ -117,7 +124,7 @@ $eaDir     = Join-Path $data "MQL5\Experts\$EaName"
 $testerDir = Join-Path $data "MQL5\Profiles\Tester"
 $commonDir = Join-Path $termBase "Common\Files"
 New-Item -ItemType Directory -Force -Path $eaDir, $testerDir | Out-Null
-Copy-Item -Force $ex5, $mq5 -Destination $eaDir
+foreach ($f in $robotFiles) { Copy-Item -Force $f.FullName -Destination $eaDir }
 Copy-Item -Force (Join-Path $presetDir "*.set") -Destination $testerDir
 Say "EA and presets installed into MT5." "Green"
 

@@ -1,5 +1,38 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
+## 1.20 — 2026-11-10 (Scalper Pro robot + daily-loss fix)
+
+Both robots compile with MetaEditor build 6308: **0 errors, 0 warnings**. Self-tests: **105 passed,
+0 failed** in both robots. PULLBACK and CROSSOVER behaviour unchanged.
+
+Owner feedback (IC Markets demo): only a few trades, wants a real scalper with more but valuable trades;
+panel showed `Day P/L −7.37% HALTED` while the robot's own 3 trades were all winners.
+
+Added
+- **`ALB_FOREX_SCALPER_PRO`**: second robot file, opens in the new SCALPER PRO mode (magic 81420262,
+  unlimited trades, 1R, M5 flat filter on). All code moved to the shared `ALB_FOREX_EMA_CORE.mqh`;
+  the two `.mq5` files only set defaults.
+- `EntryMode = SCALPER PRO`: fresh M1 crosses (close beyond both EMAs) + trend-continuation
+  pullbacks (max 3 per M1 leg, EMA14 slope), M5 trend filter, momentum candle (body ≥ 40 %),
+  ATR ≥ 5 × spread, ATR spike filter, stop behind the last 5 candles (0.8–2.5 ATR), 1R target,
+  break-even at +0.6R (+0.1R locked), slow-EMA close exit, stale-trade exit (10 bars / 0.25R),
+  3-bar cooldown after a loss, 60-minute pause after 3 losses in a row, optional day target.
+- `InpDailyLossScope`: daily loss on the whole account (default) or on this robot's trades only.
+- Dashboard: strategy line, day P/L in % and money with scope, robot's trades today and loss streak.
+- Presets `Backtest_S_ScalperPro`, `Backtest_S_ScalperPro_NoM5`, `Demo_ScalperPro`.
+- Runner: asks for the gold symbol, installs all robot files, default variants S_ScalperPro,
+  S_ScalperPro_NoM5, X_Crossover, A_Baseline.
+- 25 new self-tests (scalper helpers and the daily-loss model).
+
+Fixed
+- **Daily loss could be overstated (false halt).** The old model added deposit deals time-stamped
+  after the baseline to it; a baseline captured while MT5 was still loading the account (or a deposit
+  booked a second later) could count a deposit twice. New model: loss = −(realised trading P/L since
+  the baseline + change of floating P/L); deposits only scale the percentage (inferred from the
+  balance); baseline set on the first synchronised tick; history refreshed before any halt; persisted
+  states of older versions are ignored.
+- Dashboard labels longer than 63 characters (MT5 limit) were cut (e.g. "research EA - not valid").
+
 ## 1.10 — 2026-11-09 (new entry mode: CROSSOVER scalper)
 
 Compiled with MetaEditor build 6308: **0 errors, 0 warnings**. Self-tests: **80 passed, 0 failed**
