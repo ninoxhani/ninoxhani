@@ -22,7 +22,7 @@ after 10 bars, 3-bar cooldown after a loss, 60-minute pause after 3 losses in a 
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
 - Also available via `EntryMode`: `CROSSOVER` (v1.10, every M1 cross, simple ATR stop).
 
-> **Status: RESEARCH NO-GO (2026-11-11).** Both robots compile with 0 errors / 0 warnings
+> **Status: RESEARCH NO-GO (2026-11-11), version 1.22.** Both robots compile with 0 errors / 0 warnings
 > (MetaEditor build 6308) and pass their 108 logic self-tests.
 > - **Simulation result:** 9 months of 1-minute gold data with broker costs. The Scalper Pro
 >   defaults **lose** (−0.07R per trade, about 22 trades/day, every month negative). No tuned
@@ -46,8 +46,8 @@ Supply & Demand EA, Tradivo ProShi, EAGLE or any TradingView indicator.
 
 ```
 ALB_FOREX_EMA_SCALPER_EA/
-├── ALB_FOREX_SCALPER_PRO.ex5      compiled Scalper Pro robot v1.21
-├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled baseline robot v1.21
+├── ALB_FOREX_SCALPER_PRO.ex5      compiled Scalper Pro robot v1.22
+├── ALB_FOREX_EMA_SCALPER_EA.ex5   compiled baseline robot v1.22
 ├── ALB_FOREX_SCALPER_PRO.mq5      Scalper Pro source (defaults only)
 ├── ALB_FOREX_EMA_SCALPER_EA.mq5   baseline source (defaults only)
 ├── ALB_FOREX_EMA_CORE.mqh         shared core: all strategy, risk and execution code

@@ -1,0 +1,75 @@
+QL	0	19:33:09.527	Tester	Cloud servers switched off
+OP	0	19:33:11.393	Tester	Local network farm switched off
+CG	0	19:33:11.394	Tester	"ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_EMA_SCALPER_EA.ex5" X64
+GF	0	19:33:11.736	Tester	XAUUSD: preliminary downloading of M1 history started
+HN	0	19:33:13.416	Tester	XAUUSD: preliminary downloading of M1 history completed in 0:00:01.688
+HJ	0	19:33:13.416	Tester	XAUUSD: history data begins from 2023.12.28 00:00
+OH	0	19:33:14.020	Tester	XAUUSD: preliminary downloading of history ticks started, it may take quite a long time
+IN	0	19:33:15.027	Tester	XAUUSD: "bases\MetaQuotes-Demo\ticks\XAUUSD\202512.tkc" download (7661.90 Kb/sec)
+PN	0	19:33:16.027	Tester	XAUUSD: 47% ticks downloaded (9046.41 Kb/sec)
+CG	0	19:33:19.051	Tester	XAUUSD: 51% ticks downloaded (9192.18 Kb/sec)
+DN	0	19:33:19.051	Tester	XAUUSD: "bases\MetaQuotes-Demo\ticks\XAUUSD\202511.tkc" download (9805.28 Kb/sec)
+FS	0	19:33:21.056	Tester	XAUUSD: "bases\MetaQuotes-Demo\ticks\XAUUSD\202510.tkc" download (6682.74 Kb/sec)
+LS	0	19:33:22.066	Tester	XAUUSD: 61% ticks downloaded (9029.86 Kb/sec)
+JI	0	19:33:22.066	Tester	XAUUSD: "bases\MetaQuotes-Demo\ticks\XAUUSD\202509.tkc" download (12786.16 Kb/sec)
+MO	0	19:33:23.066	Tester	XAUUSD: "bases\MetaQuotes-Demo\ticks\XAUUSD\202508.tkc" download (8433.75 Kb/sec)
+IO	0	19:33:24.066	Tester	XAUUSD: 70% ticks downloaded (8930.67 Kb/sec)
+GF	0	19:33:24.066	Tester	XAUUSD: "bases\MetaQuotes-Demo\ticks\XAUUSD\202507.tkc" download (8569.02 Kb/sec)
+CH	0	19:33:25.076	Tester	XAUUSD: "bases\MetaQuotes-Demo\ticks\XAUUSD\202506.tkc" download (12904.21 Kb/sec)
+JH	0	19:33:26.086	Tester	XAUUSD: preliminary downloading of history ticks completed, 109.11 Mb in 0:00:12.672 (8817.23 Kb/sec)
+PE	0	19:33:26.086	Tester	XAUUSD: ticks data begins from 2025.05.27 00:00
+OO	0	19:33:26.117	Core 1	agent process started on 127.0.0.1:3000
+RH	0	19:33:26.117	Core 1	connecting to 127.0.0.1:3000
+HM	0	19:33:27.152	Core 1	connected
+FO	0	19:33:27.194	Core 1	authorized (agent build 6316)
+NK	0	19:33:27.198	Tester	XAUUSD,M1 (MetaQuotes-Demo): testing of Experts\ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_EMA_SCALPER_EA.ex5 from 2025.01.01 00:00 to 2026.11.01 00:00
+JP	0	19:33:27.269	Core 1	common synchronization completed
+KJ	0	19:33:27.691	Core 1	XAUUSD: history for 2024 year synchronized
+LM	0	19:33:27.692	Core 1	XAUUSD: history synchronization completed [2282 Kb]
+OG	0	19:33:27.692	Core 1	XAUUSD: 2.23 Mb of history processed in 0:00:00.281
+RN	0	19:33:27.745	Core 1	XAUUSD: ticks synchronization [33745 Kb]
+OF	0	19:33:27.949	Core 1	XAUUSD: ticks synchronization [26498 Kb]
+JN	0	19:33:28.272	Core 1	XAUUSD: ticks synchronization [16568 Kb]
+GG	0	19:33:28.554	Core 1	XAUUSD: ticks synchronization [11561 Kb]
+FO	0	19:33:28.823	Core 1	XAUUSD: ticks synchronization [10524 Kb]
+OK	0	19:33:29.083	Core 1	XAUUSD: ticks synchronization completed [10334 Kb]
+EG	0	19:33:35.398	Core 1	MetaTester 5 started on 127.0.0.1:3000
+EM	0	19:33:35.398	Core 1	cloud network mode is off
+DI	0	19:33:35.398	Core 1	initialization finished
+DD	0	19:33:35.398	Core 1	login (build 6316)
+PL	0	19:33:35.398	Core 1	9148 bytes of account info loaded
+RD	0	19:33:35.398	Core 1	1478 bytes of tester parameters loaded
+PP	0	19:33:35.398	Core 1	59076 bytes of input parameters loaded
+PE	0	19:33:35.398	Core 1	47135 bytes of symbols list loaded (12164 symbols)
+RS	0	19:33:35.398	Core 1	expert file added: Experts\ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_EMA_SCALPER_EA.ex5. 204205 bytes loaded
+RO	0	19:33:35.398	Core 1	4387 Mb available, 54 blocks set for ticks generating
+LJ	0	19:33:35.398	Core 1	initial deposit 10000.00 USD, leverage 1:100
+CG	0	19:33:35.398	Core 1	successfully initialized
+FJ	0	19:33:35.398	Core 1	261 Kb of total initialization data received
+MO	0	19:33:35.398	Core 1	Intel Core i3-6100  @ 3.70GHz, 7966 MB
+NF	0	19:33:35.398	Core 1	XAUUSD: symbol to be synchronized
+RR	0	19:33:35.398	Core 1	XAUUSD: symbol synchronized, 3800 bytes of symbol info received
+PS	0	19:33:35.398	Core 1	XAUUSD: load 2.23 Mb of history data to synchronize in 0:00:00.292
+OH	0	19:33:35.398	Core 1	XAUUSD: history synchronized from 2024.01.02 to 2026.11.09
+ME	0	19:33:35.398	Core 1	XAUUSD: ticks synchronization started
+FN	0	19:33:35.398	Core 1	XAUUSD: load 106.56 Mb of tick data to synchronize in 0:00:01.578
+HF	0	19:33:35.398	Core 1	XAUUSD: history ticks synchronized from 2025.05.27 to 2026.11.06
+NO	0	19:33:35.398	Core 1	XAUUSD,M1: history cache allocated for 1043788 bars and contains 355673 bars from 2024.01.02 01:00 to 2024.12.31 23:58
+FK	0	19:33:35.398	Core 1	XAUUSD,M1: history begins from 2024.01.02 01:00
+EN	0	19:33:35.398	Core 1	XAUUSD,M1 (MetaQuotes-Demo): generating based on real ticks
+KG	0	19:33:35.398	Core 1	XAUUSD,M1: testing of Experts\ALB_FOREX_EMA_SCALPER_EA\ALB_FOREX_EMA_SCALPER_EA.ex5 from 2025.01.01 00:00 to 2026.11.01 00:00 started with inputs:
+QN	0	19:33:35.398	Core 1	  === General ====
+HH	0	19:33:35.398	Core 1	  InpTradingMode=0
+IE	0	19:33:35.398	Core 1	  InpTradingSymbol=
+GO	0	19:33:35.398	Core 1	  InpMagicNumber=81420262
+QE	0	19:33:35.398	Core 1	  InpEnableLiveTrading=false
+EQ	0	19:33:35.398	Core 1	  InpOrderComment=ALBFX_SCP
+DK	0	19:33:35.398	Core 1	  === Strategy ====
+KF	0	19:33:35.398	Core 1	  InpFastEMA=8
+GP	0	19:33:35.398	Core 1	  InpSlowEMA=14
+PK	0	19:33:35.398	Core 1	  InpTrendTF=5
+IG	0	19:33:35.398	Core 1	  InpEntryTF=1
+ES	0	19:33:35.398	Core 1	  InpEntryMode=2
+HF	0	19:33:35.398	Core 1	  InpConfirmationMode=0
+JF	0	19:33:35.398	Core 1	  InpRequireM1EMAAlignment=false
+PO	0	19:33:35.398	Core 1	  InpModeBInvalidateOnCloseThrough=true

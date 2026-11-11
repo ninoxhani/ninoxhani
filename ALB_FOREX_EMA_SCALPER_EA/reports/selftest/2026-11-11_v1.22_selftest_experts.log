@@ -1,0 +1,17 @@
+# MT5 Experts log - v1.22 self-test runs (both robots)
+# 2026-11-11 | MetaTrader 5 x64 build 6308 on Wine 11.0 (cloud sandbox) | offline terminal, no broker account
+# EURUSD M1 sample chart; set file: InpRunSelfTests=true, InpEnableNewsFilter=false; all other inputs = robot defaults
+# Purpose: T0.2 pure-logic self-tests + clean init/deinit. Not a trading test; the v1.22 tester fix needs a Strategy Tester run.
+
+19:13:53.752	ALB_FOREX_SCALPER_PRO (EURUSD,M1)	[AFX-EMA][SELFTEST] 108 passed, 0 failed
+19:13:53.753	ALB_FOREX_SCALPER_PRO (EURUSD,M1)	[AFX-EMA][WARN] This EA is designed and documented for XAUUSD. EURUSD is untested.
+19:13:53.767	ALB_FOREX_SCALPER_PRO (EURUSD,M1)	[AFX-EMA] Journal: Common\Files\ALBFX_EMA_SCALPER_Journal_EURUSD_81420262_LIVE.csv
+19:13:53.767	ALB_FOREX_SCALPER_PRO (EURUSD,M1)	[AFX-EMA] ALB_FOREX_SCALPER_PRO v1.22 started on EURUSD | FULL_AUTO | executing (demo) | magic 81420262 | filling FOK | point 0.00001 tick 0.00001 | lots 0.01-500.00 step 0.01
+19:13:53.767	ALB_FOREX_SCALPER_PRO (EURUSD,M1)	[AFX-EMA] Strategy: trend PERIOD_M5 EMA8/14 (closed bar), entry PERIOD_M1, entry mode SCALPER PRO (M5 filter ON, crosses ON, continuations ON, BE 0.60R, stale 10 bars, RR 1.00, max trades/day unlimited), flat filter ON, account NETTING, news DISABLED
+19:14:01.148	ALB_FOREX_SCALPER_PRO (EURUSD,M1)	[AFX-EMA] Stopped (reason 9). Session: evaluated 0, setups 0, patterns 0, valid 0, orders 0, fills 0, alerts 0, daily-limit hits 0
+19:14:21.854	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA][SELFTEST] 108 passed, 0 failed
+19:14:21.854	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA][WARN] This EA is designed and documented for XAUUSD. EURUSD is untested.
+19:14:21.862	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] Journal: Common\Files\ALBFX_EMA_SCALPER_Journal_EURUSD_81420261_LIVE.csv
+19:14:21.862	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] ALB_FOREX_EMA_SCALPER_EA v1.22 started on EURUSD | FULL_AUTO | executing (demo) | magic 81420261 | filling FOK | point 0.00001 tick 0.00001 | lots 0.01-500.00 step 0.01
+19:14:21.862	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] Strategy: trend PERIOD_M5 EMA8/14 (closed bar), entry PERIOD_M1, confirmation A (same candle), flat filter OFF, account NETTING, news DISABLED
+19:14:34.275	ALB_FOREX_EMA_SCALPER_EA (EURUSD,M1)	[AFX-EMA] Stopped (reason 9). Session: evaluated 0, setups 0, patterns 0, valid 0, orders 0, fills 0, alerts 0, daily-limit hits 0

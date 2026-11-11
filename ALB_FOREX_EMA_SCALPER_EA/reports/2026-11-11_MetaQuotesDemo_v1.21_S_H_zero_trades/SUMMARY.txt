@@ -1,0 +1,8 @@
+﻿ALB FOREX EMA Scalper - automatic backtests
+Created : 2026-11-11 19:38
+Terminal: C:\Program Files\MetaTrader 5
+Symbol  : XAUUSD  M1, real ticks, 2025.01.01 -> 2026.11.01, deposit 10000 USD, leverage 1:100
+
+Variant        Result     Time
+S_ScalperPro   OK              3 min
+H_CrossTrail   OK            2.8 min

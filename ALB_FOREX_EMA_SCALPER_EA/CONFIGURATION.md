@@ -1,4 +1,4 @@
-# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.21
+# CONFIGURATION — ALB_FOREX_EMA_SCALPER_EA v1.22
 
 The MT5 inputs dialog shows the **label** (text after `//` in the source). Preset `.set` files
 and the tester `.ini` use the **variable name** (`Inp…`). Both are listed below.

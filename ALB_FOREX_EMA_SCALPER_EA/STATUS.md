@@ -1,6 +1,6 @@
 # STATUS — ALB FOREX EMA 8/14 EAs (baseline + Scalper Pro)
 
-**Version:** 1.21 · **Updated:** 2026-11-11 · **Readiness: RESEARCH NO-GO** (proxy-data simulation; broker-data confirmation pending)
+**Version:** 1.22 · **Updated:** 2026-11-11 · **Readiness: RESEARCH NO-GO** (proxy-data simulation; broker-data confirmation pending)
 
 > Read this file first when resuming work. It separates what is implemented, what is verified
 > with evidence, and what is still open. Never upgrade a status without evidence in `reports/`.
@@ -10,12 +10,12 @@
 | Gate | Status |
 |---|---|
 | Source implemented | ✅ done — two robots over one core (`ALB_FOREX_EMA_CORE.mqh`) |
-| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.21, both robots) — `reports/compile/2026-11-10_v1.21_compile.log` |
-| Self-tests pass (108 checks) | ✅ **VERIFIED** (v1.21, both robots) — `reports/selftest/2026-11-10_v1.21_selftest_experts.log` |
+| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.22, both robots) — `reports/compile/2026-11-11_v1.22_compile.log` |
+| Self-tests pass (108 checks) | ✅ **VERIFIED** (v1.22, both robots) — `reports/selftest/2026-11-11_v1.22_selftest_experts.log` |
 | Functional backtests T1 | ⬜ not done — the owner's runs so far: see "Test results" |
 | Edge cases T2 | ⬜ not run |
 | Research backtests T3 — **proxy data** | ❌ **done 2026-11-11 → NO-GO**: [`reports/research/2026-11-11_proxy_research_report.md`](reports/research/2026-11-11_proxy_research_report.md) |
-| Research backtests T3 — broker real ticks (MT5 tester) | ⬜ pending — `RUN_BACKTESTS.bat` is set up for it (S_ScalperPro vs H_CrossTrail, 2025.01.01 → 2026.11.01) |
+| Research backtests T3 — broker real ticks (MT5 tester) | ⬜ pending — first owner run (v1.21, MetaQuotes-Demo) made **0 trades because of an EA defect**, fixed in v1.22 → re-run `RUN_BACKTESTS.bat` (S_ScalperPro vs H_CrossTrail, 2025.01.01 → 2026.11.01) |
 | Demo forward test T4 | 🔶 owner demo (IC Markets) — full day 2026-11-11: 17 trades (W7 L10), −3.31 USD (−0.66 %), consistent with the simulation |
 | **Overall** | **RESEARCH NO-GO** — the Scalper Pro defaults lose in simulation with high confidence and no tuned variant passed out-of-sample. Not for real money. |
 
@@ -53,6 +53,14 @@
 
 ## Completed implementation
 
+- **v1.22** (2026-11-11): Strategy Tester fix.
+  - The owner's first non-visual tester run made 0 trades: every bar was rejected as
+    `DATA_NOT_READY`.
+  - Cause: the tester calculates standard indicators only when their data is requested, and
+    `IndicatorsReady()` waited for `BarsCalculated()` before requesting anything.
+  - It now requests one value first. Live behaviour is unchanged.
+  - The runner prints trades, net and PF per variant, flags 0 trades and shows the date the
+    broker's real ticks begin.
 - **v1.21** (2026-11-10): mid-day start no longer counts a same-day position twice in the day P/L
   (owner screen: `Day P/L +0.56` with the account at +0.28). State version 121.
 - **v1.20** (2026-11-10, owner request "more trades, but valuable ones; get in and out fast"):
@@ -90,14 +98,20 @@ ticks, the new daily-loss model on a live account, and any backtest performance.
 
 ## Compilation status
 
-**VERIFIED — 0 errors, 0 warnings** for every version (v1.00, v1.01, v1.10, v1.20, v1.21).
+**VERIFIED — 0 errors, 0 warnings** for every version (v1.00, v1.01, v1.10, v1.20, v1.21, v1.22).
 Compiler: MetaEditor64.exe **5.0.0.6308** (official MetaQuotes installer, signed by MetaQuotes Ltd),
 under WineHQ 11.0 in a Linux cloud sandbox with the owner's approval. Hashes in the compile logs.
 Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE.mqh` next to the `.mq5` files.
 
 ## Test results
 
-- **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.21: 0/0 and 108/108, both robots).
+- **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.22: 0/0 and 108/108, both robots).
+- **Owner tester run, 2026-11-11 (v1.21, MetaQuotes-Demo, XAUUSD M1 real ticks, 2025.01.01 → 2026.11.01,
+  S_ScalperPro + H_CrossTrail):** **0 trades** in both. All 638,414 bar checks were rejected as
+  `DATA_NOT_READY` (EA defect, fixed in v1.22).
+  - It says nothing about the strategy.
+  - MetaQuotes-Demo has real ticks only from 2025-05-27.
+  - Evidence: `reports/2026-11-11_MetaQuotesDemo_v1.21_S_H_zero_trades/`.
 - **T3 proxy-data research (2026-11-11):** NO-GO. See the section above and
   `reports/research/` (report and logs of every run).
 - **Owner demo, full day 2026-11-11 (IC Markets demo, Scalper Pro v1.21, 500 USD):**
@@ -156,8 +170,10 @@ Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE
 
 1. **Owner:** do not run Scalper Pro (or Crossover) with money that matters. On demo it only
    repeats the measured loss. Remove it from the chart, or switch `TradingMode` to `ALERT_ONLY`.
-2. **Owner:** run `RUN_BACKTESTS.bat` once (symbol `XAUUSD` for IC Markets; it may run for hours,
-   overnight is fine). Send the zip from the Desktop.
+2. **Owner:** run `RUN_BACKTESTS.bat` once from the **v1.22** package (symbol `XAUUSD`; it may run
+   for hours, overnight is fine). Send the zip from the Desktop.
+   - Before starting, log MT5 in to the **IC Markets** account and close MT5.
+   - The v1.21 run was on MetaQuotes-Demo, which only has real ticks from 2025-05-27.
    - It tests **S_ScalperPro** (the control) and **H_CrossTrail** on the broker's real ticks,
      2025.01.01 → 2026.11.01.
 3. **Analyse the zip:**

@@ -1,4 +1,4 @@
-# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.21
+# STRATEGY_SPEC — ALB_FOREX_EMA_SCALPER_EA v1.22
 
 This document describes **exactly what the source code implements**. Where the master
 prompt left a choice open, the chosen default and the reason are recorded under

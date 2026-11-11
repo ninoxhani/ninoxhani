@@ -66,6 +66,36 @@ function Get-Mt5Reason([string]$dataDir, [datetime]$since) {
     return ($msgs -join " | ")
 }
 
+# Key numbers from the EA's extended report in $dir (trades, net, PF, main rejection reason).
+function Get-Field([string[]]$lines, [string]$pattern) {
+    foreach ($l in $lines) { if ($l -match $pattern) { return $Matches[1].Trim() } }
+    return "?"
+}
+function Get-ReportStats([string]$dir) {
+    $rep = Get-ChildItem -Path $dir -Filter "ALBFX_EMA_SCALPER_Report_*.txt" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $rep) { return $null }
+    $lines = @(Get-Content -Path $rep.FullName -ErrorAction SilentlyContinue)
+    $top = ""
+    for ($i = 0; $i -lt $lines.Count - 1; $i++) {
+        if ($lines[$i].Trim() -eq "Rejection reasons:") { $top = ($lines[$i + 1].Trim() -replace '\s+', ' '); break }
+    }
+    return [pscustomobject]@{
+        Trades = (Get-Field $lines 'Total closed trades\s*:\s*(\d+)')
+        Net    = (Get-Field $lines 'Net profit\s*:\s*(\S+)')
+        PF     = (Get-Field $lines 'Profit factor\s*:\s*(\S+)')
+        Top    = $top
+    }
+}
+
+# First date with real ticks, from the tester log copied into $dir (UTF-16).
+function Get-TickStart([string]$dir) {
+    $log = Join-Path $dir "tester_journal.log"
+    if (-not (Test-Path $log)) { return "" }
+    $m = Select-String -Path $log -Pattern 'ticks data begins from (\d{4}\.\d\d\.\d\d)' -Encoding Unicode -List -ErrorAction SilentlyContinue
+    if ($m) { return $m.Matches[0].Groups[1].Value }
+    return ""
+}
+
 Say "=== ALB FOREX EMA Scalper - automatic backtests ===" "Cyan"
 Say ("Symbol {0} | {1} -> {2} | deposit {3} USD | variants: {4}" -f $Symbol, $From, $To, $Deposit, ($Variants -join ", "))
 
@@ -136,6 +166,7 @@ New-Item -ItemType Directory -Force -Path $out | Out-Null
 
 $safeSym = ($Symbol -replace '[\\/:*?"<>|]', '_')
 $summary = @()
+$tickStart = ""
 
 # --- 6. run each variant ------------------------------------------------------
 $n = 0
@@ -226,9 +257,23 @@ foreach ($v in $Variants) {
 
     $ok = ($html.Count -gt 0) -or ($ext.Count -gt 0)
     $state = if ($DryRun) { "DRY RUN" } elseif ($ok) { "OK" } else { "NO REPORT" }
-    $summary += ("{0,-14} {1,-10} {2,6} min" -f $v, $state, $mins)
+    $extra = ""
+    $st = if ($ok) { Get-ReportStats $vOut } else { $null }
+    if ($st) {
+        $extra = "trades {0}, net {1}, PF {2}" -f $st.Trades, $st.Net, $st.PF
+        if ($st.Trades -eq "0") { $state = "0 TRADES"; $extra += " | main rejection: " + $st.Top }
+    }
+    if ($ok -and -not $tickStart) {
+        $tickStart = Get-TickStart $vOut
+        if ($tickStart) { $summary += ("(broker real ticks begin {0}; earlier dates use ticks generated from M1 bars)" -f $tickStart) }
+    }
+    $summary += ("{0,-14} {1,-10} {2,6} min   {3}" -f $v, $state, $mins, $extra)
     if ($ok -or $DryRun) {
-        if ($ok) { Say ("  done in {0} min" -f $mins) "Green" }
+        if ($st -and $st.Trades -eq "0") {
+            Say ("  WARNING: 0 trades in {0} min. Main rejection: {1}" -f $mins, $st.Top) "Yellow"
+        } elseif ($ok) {
+            Say ("  done in {0} min: {1}" -f $mins, $extra) "Green"
+        }
         continue
     }
 
@@ -268,7 +313,7 @@ Set-Content -Path (Join-Path $out "SUMMARY.txt") -Value (@(
     "Terminal: $($pick.Origin)",
     "Symbol  : $Symbol  M1, real ticks, $From -> $To, deposit $Deposit USD, leverage 1:$Leverage",
     "",
-    "Variant        Result     Time"
+    "Variant        Result        Time   Key numbers (from the EA's extended report)"
 ) + $summary) -Encoding UTF8
 
 $zip = "$out.zip"

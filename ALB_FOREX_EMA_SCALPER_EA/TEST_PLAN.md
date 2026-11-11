@@ -1,4 +1,4 @@
-# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.21
+# TEST_PLAN — ALB_FOREX_EMA_SCALPER_EA v1.22
 
 Status of every item is tracked in [STATUS.md](STATUS.md). An item is **PASSED** only with
 evidence (compiler log, tester report, journal lines). Nothing below has been passed yet

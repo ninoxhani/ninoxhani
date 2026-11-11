@@ -1,0 +1,32 @@
+==================== ALB FOREX | EMA 8/14 PULLBACK - EXTENDED REPORT ====================
+EA ALB_FOREX_EMA_SCALPER_EA v1.21 | symbol XAUUSD | magic 81420262
+Config: ENTRY MODE=SCALPER PRO M5filter=true cross=true cont=true perLeg=3 body=0.40 slope=0.10 ATR/spread>=5.0 spike<=2.5 SL=5bars(+0.15,0.80-2.50ATR) BE=0.60R(+0.10) stale=10/0.25R emaExit=true cooldown=3 pause=3/60min target=0.00%
+Config: daily loss scope=WHOLE ACCOUNT
+Config: mode=FULL_AUTO confirm=A_SAME_CANDLE flatFilter=true(sep=true 0.10, slope=true 0.10/3 bars) M1align=false
+Config: risk=0.50% RR=1.00 dailyLoss=2.00% maxTrades=0 spreadRatio=0.15 drift=0.20ATR BE=false trail=false timeExit=false
+News filter: DISABLED - backtest has NO news protection (limitation)
+--------------------------------------------------------------------------------------
+1  Total closed trades       : 0
+2  Win rate                  : 0.00% (0 W / 0 L)
+3  Net profit                : 0.00
+4  Profit factor             : n/a
+5  Max equity drawdown       : 0.00 (0.00%)
+6  Average win               : 0.00
+7  Average loss              : 0.00
+8  Average realised R        : 0.000 (over 0 trades with recorded risk)
+9  Expectancy per trade      : 0.00 (account currency)
+10 Trade duration (minutes)  : average 0.0, median 0.0
+11 Trading costs             : 0.00 (commission + swap + fees)
+12 Results by month (exit month):
+13 Max consecutive losses    : 0
+14 BUY  : 0 trades, win 0.0%, net 0.00
+   SELL : 0 trades, win 0.0%, net 0.00
+15 Signal funnel: evaluated 638414, setups (trend+touch) 0, confirmed patterns 0, passed all filters 0, rejected after pattern 0 (0.0%)
+   Orders sent 0, fills verified 0, alerts 0
+   Rejection reasons:
+     DATA_NOT_READY                 638414
+16 Daily loss-limit activations: 0  
+   Emergency closes: 0
+Break-even win rate at 1.00R before costs: 50.0%
+No profitability claim is implied. Validate out-of-sample before any live use.
+======================================================================================

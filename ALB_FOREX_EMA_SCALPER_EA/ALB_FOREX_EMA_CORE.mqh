@@ -42,7 +42,7 @@
    #define AFX_DEF_COMMENT       "ALBFX_EMA"
 #endif
 
-#define AFX_EA_VERSION           "1.21"
+#define AFX_EA_VERSION           "1.22"
 #define AFX_STATE_VERSION        121
 #define AFX_OBJ_PREFIX           "AFXES_"
 #define AFX_MAX_RISK_PERCENT     5.0
@@ -2237,9 +2237,18 @@ bool IndicatorsReady(string &why)
    int hs[7];
    hs[0] = g_hFastE; hs[1] = g_hSlowE; hs[2] = g_hAtrE; hs[3] = g_hAtrLongE;
    hs[4] = g_hFastT; hs[5] = g_hSlowT; hs[6] = g_hAtrT;
+   double probe[];
    for(int i = 0; i < 7; i++)
      {
       int bars = (i < 4) ? bE : bT;
+      //--- The Strategy Tester calculates standard indicators only when their data is requested:
+      //--- without this request BarsCalculated() never catches up and every bar is rejected
+      //--- (v1.21 tester run: 0 trades, all DATA_NOT_READY). Live charts calculate on every tick.
+      if(CopyBuffer(hs[i], 0, 0, 1, probe) < 1)
+        {
+         why = StringFormat("indicator %d has no data yet (err %d)", i, GetLastError());
+         return false;
+        }
       int bc = BarsCalculated(hs[i]);
       if(bc < bars)
         {

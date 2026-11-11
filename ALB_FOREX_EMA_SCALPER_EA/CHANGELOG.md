@@ -1,5 +1,33 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
+## 1.22 — 2026-11-11 (Strategy Tester fix)
+
+Both robots: **0 errors, 0 warnings** (MetaEditor 6308), self-tests **108 passed, 0 failed**.
+Trading rules unchanged.
+
+Fixed
+- **No trades in the Strategy Tester (non-visual).** The owner's first broker-data run
+  (MetaQuotes-Demo, XAUUSD M1 real ticks, 2025.01.01 → 2026.11.01) made 0 trades in both variants.
+  - Symptom: all 638,414 bar checks were rejected as `DATA_NOT_READY` with
+    `indicator 0 not calculated yet`.
+  - Cause: the tester calculates standard indicators only when their data is requested.
+    `IndicatorsReady()` waited for `BarsCalculated()` to catch up before requesting any data, so
+    it never did.
+  - Fix: request one value of each indicator first, then check. Live charts were not affected
+    (they calculate on every tick); the v1.00 visual-mode test was not affected either.
+  - The tester fix itself needs an owner tester run to confirm.
+
+Changed (runner, `tools/run_backtests.ps1`)
+- The summary shows trades, net profit and profit factor per variant from the EA's extended
+  report.
+- A run with 0 trades is flagged `0 TRADES` with the main rejection reason; before, it showed `OK`.
+- The summary shows the date the broker's real ticks begin. Earlier dates in a test use ticks
+  generated from M1 bars.
+- Tested on the owner's real result files and with a PowerShell 7 dry run.
+
+Evidence: `reports/2026-11-11_MetaQuotesDemo_v1.21_S_H_zero_trades/`,
+`reports/compile/2026-11-11_v1.22_compile.log`, `reports/selftest/2026-11-11_v1.22_selftest_experts.log`.
+
 ## Research — 2026-11-11 (no EA code change; robots stay v1.21)
 
 Owner request after a losing demo day (13 trades, −3.46 USD): make the robot profitable.
