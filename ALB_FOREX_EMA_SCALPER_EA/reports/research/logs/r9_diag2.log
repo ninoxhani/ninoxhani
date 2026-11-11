@@ -1,0 +1,20 @@
+
+=== A Asia 02-09
+    IS            n=  636 /day= 5.89 win=30.5% avgR=+0.190 totR=  +120.7 PF=1.27 maxDD=  21.2R  long=  +47.3 short=  +73.4
+    stress x1.5   n=  588 /day= 5.44 win=29.1% avgR=+0.133 totR=   +78.4 PF=1.19 maxDD=  21.9R  long=  +26.6 short=  +51.9
+    stress x2     n=  506 /day= 4.69 win=27.5% avgR=+0.065 totR=   +32.9 PF=1.09 maxDD=  36.5R  long=   +8.8 short=  +24.0
+    by month: 26-02:+14.4 26-03:+35.7 26-04:+6.3 26-05:+14.5 26-06:+46.9 26-07:+2.9
+    by SERVER hour (R/n): 2:+61/134 3:+19/110 4:+1/105 5:+1/81 6:-3/69 7:+12/73 8:+29/64
+    by weekday: {'Mon': (138, 42.4), 'Tue': (126, 22.0), 'Wed': (120, 44.1), 'Thu': (121, -15.9), 'Fri': (131, 28.0)}
+    total +120.7R over 107 trading days; day-block bootstrap 5-95%: +43.2 .. +202.5 R; P(total<=0) = 0.004
+    best 10 trades sum +29.8R; total without them +90.9R
+
+=== C all hours
+    IS            n=  393 /day= 3.64 win=51.9% avgR=+0.116 totR=   +45.8 PF=1.24 maxDD=  16.5R  long=   +3.6 short=  +42.1
+    stress x1.5   n=  365 /day= 3.38 win=51.8% avgR=+0.098 totR=   +35.8 PF=1.21 maxDD=  14.9R  long=   +2.6 short=  +33.2
+    stress x2     n=  333 /day= 3.08 win=50.5% avgR=+0.059 totR=   +19.7 PF=1.12 maxDD=  13.7R  long=   +0.6 short=  +19.1
+    by month: 26-02:+5.3 26-03:+25.2 26-04:-7.6 26-05:+8.6 26-06:+14.3
+    by SERVER hour (R/n): 1:-1/13 2:+5/18 3:+2/14 4:+5/14 5:-5/17 6:-2/23 7:+2/7 8:+3/21 9:-4/21 10:+10/16 11:-2/30 12:+0/10 13:+10/15 14:+1/18 15:+3/14 16:+7/19 17:-8/18 18:+14/23 19:+3/12 20:-2/15 21:-1/10 22:+3/27 23:+1/18
+    by weekday: {'Mon': (76, 2.6), 'Tue': (72, 15.2), 'Wed': (79, -0.6), 'Thu': (90, 21.1), 'Fri': (75, 8.5), 'Sat': (1, -1.0)}
+    total +45.8R over 103 trading days; day-block bootstrap 5-95%: +8.6 .. +83.2 R; P(total<=0) = 0.022
+    best 10 trades sum +37.5R; total without them +8.3R

@@ -96,6 +96,15 @@ period (trend, range, high/low volatility) from the monthly table.
 | X-T | `Backtest_X_CrossTrend.set` | X + only crosses in the M5 trend direction |
 | S | `Backtest_S_ScalperPro.set` | **Scalper Pro** (§18): crosses + continuations, filters, BE/stale/EMA exits, 1R |
 | S-noM5 | `Backtest_S_ScalperPro_NoM5.set` | S without the M5 trend filter (more trades) |
+| H | `Backtest_H_CrossTrail.set` | S with crosses only, no early exits, trailing stop 1.5 ATR after +1R, 4R target (research hypothesis, 2026-11-11) |
+
+**Status 2026-11-11:**
+- **Proxy-data part:** done. 1-minute gold data and the `research/` simulator; in-sample Feb–Jun
+  2026, out-of-sample Jul–Nov 2026. Result **NO-GO**; see
+  `reports/research/2026-11-11_proxy_research_report.md`.
+- **Broker part:** pending. `RUN_BACKTESTS.bat` defaults to S vs H on 2025.01.01 → 2026.11.01
+  (real ticks). Nothing was tuned on broker data, so the whole period is out-of-sample for both,
+  and the decision rules below apply to it.
 
 **Metrics (extended report + MT5 report):** total trades, win rate, net profit, profit factor,
 max equity drawdown, average win, average loss, average realised R, expectancy, average and

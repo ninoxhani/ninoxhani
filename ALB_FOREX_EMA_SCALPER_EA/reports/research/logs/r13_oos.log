@@ -1,0 +1,26 @@
+
+===== P5
+  EA as traded (no blackout)   IS : n=  378 /day= 3.50 win=50.3% avgR=+0.240 totR=   +90.8 PF=1.51 maxDD=  10.7R  long=  +18.1 short=  +72.8
+                               OOS: n=  348 /day= 3.62 win=44.5% avgR=-0.096 totR=   -33.5 PF=0.82 maxDD=  44.2R  long=  -16.7 short=  -16.8
+                               OOS by month: 26-07:+0.5 26-08:-13.3 26-09:+2.4 26-10:-21.1 26-11:-2.1
+                               OOS risk per trade: median 6.59 USD/oz (= USD per 0.01 lot), p90 12.82
+  funding blackout 60/30       IS : n=  315 /day= 2.92 win=50.2% avgR=+0.266 totR=   +83.7 PF=1.56 maxDD=   9.4R  long=  +18.0 short=  +65.6
+                               OOS: n=  293 /day= 3.05 win=43.3% avgR=-0.115 totR=   -33.8 PF=0.79 maxDD=  43.0R  long=  -15.9 short=  -17.9
+  x1.5 costs, no blackout      IS : n=  377 /day= 3.49 win=50.1% avgR=+0.229 totR=   +86.2 PF=1.48 maxDD=  10.9R  long=  +17.3 short=  +68.8
+                               OOS: n=  341 /day= 3.55 win=44.6% avgR=-0.110 totR=   -37.6 PF=0.80 maxDD=  45.0R  long=  -15.5 short=  -22.1
+  -> PASS RULES: base FAIL, stress avg>0 FAIL
+  x1.5 costs + blackout        IS : n=  315 /day= 2.92 win=49.8% avgR=+0.250 totR=   +78.8 PF=1.53 maxDD=   9.5R  long=  +16.6 short=  +62.2
+                               OOS: n=  284 /day= 2.96 win=42.6% avgR=-0.130 totR=   -36.9 PF=0.77 maxDD=  44.9R  long=  -14.1 short=  -22.8
+
+===== P15
+  EA as traded (no blackout)   IS : n=  178 /day= 1.65 win=48.9% avgR=+0.233 totR=   +41.5 PF=1.45 maxDD=   8.9R  long=  +11.7 short=  +29.8
+                               OOS: n=  153 /day= 1.59 win=41.8% avgR=-0.088 totR=   -13.5 PF=0.83 maxDD=  20.4R  long=   -7.3 short=   -6.2
+                               OOS by month: 26-07:-5.3 26-08:-2.2 26-09:-1.4 26-10:-0.6 26-11:-4.1
+                               OOS risk per trade: median 11.11 USD/oz (= USD per 0.01 lot), p90 19.96
+  funding blackout 60/30       IS : n=  159 /day= 1.47 win=51.6% avgR=+0.345 totR=   +54.9 PF=1.71 maxDD=   8.0R  long=  +16.5 short=  +38.4
+                               OOS: n=  122 /day= 1.27 win=42.6% avgR=-0.116 totR=   -14.2 PF=0.77 maxDD=  18.7R  long=  -11.0 short=   -3.2
+  x1.5 costs, no blackout      IS : n=  178 /day= 1.65 win=48.9% avgR=+0.236 totR=   +42.1 PF=1.46 maxDD=   9.0R  long=  +13.3 short=  +28.7
+                               OOS: n=  152 /day= 1.58 win=42.1% avgR=-0.100 totR=   -15.2 PF=0.81 maxDD=  22.6R  long=   -7.8 short=   -7.4
+  -> PASS RULES: base FAIL, stress avg>0 FAIL
+  x1.5 costs + blackout        IS : n=  159 /day= 1.47 win=51.6% avgR=+0.350 totR=   +55.6 PF=1.72 maxDD=   8.0R  long=  +18.1 short=  +37.5
+                               OOS: n=  122 /day= 1.27 win=42.6% avgR=-0.136 totR=   -16.6 PF=0.74 maxDD=  21.0R  long=  -11.4 short=   -5.2

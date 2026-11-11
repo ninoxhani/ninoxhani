@@ -208,6 +208,7 @@ Everything else below has the same default in both.
 | `Demo_Scalper.set` | CROSSOVER scalper for a demo account, news ON |
 | `Backtest_S_ScalperPro.set` | **SCALPER PRO** (same settings as the Scalper Pro robot), news OFF |
 | `Backtest_S_ScalperPro_NoM5.set` | SCALPER PRO without the M5 trend filter (more trades) |
+| `Backtest_H_CrossTrail.set` | research hypothesis H: SCALPER PRO crosses only (`ScUseContinuation=false`), no BE/stale/EMA/opposite-cross exits, `EnableTrailingStop=true` (start 1.0R, 1.5 × ATR), `RewardRisk=4.0`. About break-even in the proxy simulation; for the broker-data test only |
 | `Demo_ScalperPro.set` | SCALPER PRO for a demo account, news ON (magic 81420262) |
 | `Demo_FullAuto.set` | demo account forward test, news ON |
 | `AlertOnly.set` | signals only |

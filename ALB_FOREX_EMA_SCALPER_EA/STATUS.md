@@ -1,6 +1,6 @@
 # STATUS — ALB FOREX EMA 8/14 EAs (baseline + Scalper Pro)
 
-**Version:** 1.21 · **Updated:** 2026-11-10 · **Readiness: INCOMPLETE**
+**Version:** 1.21 · **Updated:** 2026-11-11 · **Readiness: RESEARCH NO-GO** (proxy-data simulation; broker-data confirmation pending)
 
 > Read this file first when resuming work. It separates what is implemented, what is verified
 > with evidence, and what is still open. Never upgrade a status without evidence in `reports/`.
@@ -14,9 +14,35 @@
 | Self-tests pass (108 checks) | ✅ **VERIFIED** (v1.21, both robots) — `reports/selftest/2026-11-10_v1.21_selftest_experts.log` |
 | Functional backtests T1 | ⬜ not done — the owner's runs so far: see "Test results" |
 | Edge cases T2 | ⬜ not run |
-| Research backtests T3 (in/out-of-sample) | ⬜ not run — **no backtest performance data exists** |
-| Demo forward test T4 | 🔶 started by the owner (IC Markets demo, 2026-11-10) — tiny sample, see below |
-| **Overall** | **INCOMPLETE** — compiled and self-tested; not DEMO READY until T1 passes; not a LIVE CANDIDATE |
+| Research backtests T3 — **proxy data** | ❌ **done 2026-11-11 → NO-GO**: [`reports/research/2026-11-11_proxy_research_report.md`](reports/research/2026-11-11_proxy_research_report.md) |
+| Research backtests T3 — broker real ticks (MT5 tester) | ⬜ pending — `RUN_BACKTESTS.bat` is set up for it (S_ScalperPro vs H_CrossTrail, 2025.01.01 → 2026.11.01) |
+| Demo forward test T4 | 🔶 owner demo (IC Markets) — 2026-11-11: 13 trades, −3.46 USD, consistent with the simulation |
+| **Overall** | **RESEARCH NO-GO** — the Scalper Pro defaults lose in simulation with high confidence and no tuned variant passed out-of-sample. Not for real money. |
+
+## Research result (2026-11-11, proxy-data simulation — not the MT5 tester)
+
+**Data and costs**
+- Binance XAUUSDT perpetual 1-minute candles, clean window 2026-02-01 → 2026-11-10.
+- IC Markets trading hours (server = New York + 7 h).
+- Costs: spread 0.10–0.40 by hour, commission 7 USD/lot, slippage.
+- The simulator `research/afx_bt.py` re-implements the v1.21 rules.
+
+**Findings**
+- **Scalper Pro v1.21 defaults:** 4,517 trades (22/day), −0.070R per trade (t = −6.2), −316R in
+  total, PF 0.81.
+  - All 10 months are negative.
+  - About −0.8 % of equity per day at 0.5 % risk; the owner's live day was about −0.7 %.
+- **Pullback robot:** −0.043R per trade (PF 0.93). **Crossover:** −0.077R per trade (PF 0.84).
+- **Search:** 3,360 variants were tested on in-sample data (Feb–Jun).
+  - The two best robust candidates (M5/M15 pullbacks with the H1 trend and a trailing stop) failed
+    the one-shot out-of-sample test (Jul–Nov): −0.10R and −0.09R per trade.
+  - Across all variants, in-sample and out-of-sample results are uncorrelated (−0.05). Tuning on
+    the past does not pick better variants.
+- **False edge found and rejected:** an "Asian session" edge came from Binance funding times, which
+  do not exist on spot gold.
+- **Best remaining idea, H_CrossTrail:** crosses only, trailing stop after +1R.
+  - +0.045R per trade, PF 1.09, t = 1.3 — statistically indistinguishable from zero.
+  - Found with hindsight; it is a hypothesis for the broker-data test, not a result.
 
 ## Robots
 
@@ -72,6 +98,11 @@ Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE
 ## Test results
 
 - **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.21: 0/0 and 108/108, both robots).
+- **T3 proxy-data research (2026-11-11):** NO-GO. See the section above and
+  `reports/research/` (report and logs of every run).
+- **Owner demo day, 2026-11-11 (IC Markets demo, Scalper Pro v1.21, 500 USD):**
+  - 13 trades: 5 winners, 8 losers; 1.26 USD commission; balance 500 → 496.54 (−0.7 %).
+  - The simulation's average day for v1.21 is about −0.8 %.
 - **Owner demo, 2026-11-10 ~20:25 server (IC Markets demo 53134733, v1.20 Scalper Pro on XAUUSD):** robot
   active and evaluating (`Entry: SCALPER PRO`, executing, live news OK, no halt), 0 trades yet.
   Panel `Day P/L +0.56` vs account +0.28: a position open at the robot's start was counted twice by
@@ -94,11 +125,14 @@ Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE
 - **Owner tester run (v1.00, XAUUSD.std M1, 2026.10.01–10.05, visual):** exposed the BUY drift
   defect (fixed in v1.01).
 - **Strategy Tester in the sandbox:** impossible — MT5 requires a broker account.
-- **No backtest performance statistics exist.**
+- **No MT5 Strategy Tester performance report exists.** The only performance evidence is the
+  proxy-data simulation above.
 
 ## Incomplete / unverified
 
-- All functional, edge-case, research tests (TEST_PLAN T1–T3), especially for SCALPER PRO.
+- MT5 Strategy Tester on the broker's real ticks (T3 broker part); functional and edge-case tests (T1, T2).
+- The simulator is a re-implementation, checked against the source rule by rule, not against MT5
+  tester output. The S_ScalperPro run on real ticks will show whether both agree.
 - New daily-loss model on a live account with deposits (TEST_PLAN T2.20, T2.21).
 - News CSV export/tester path; emergency close (`Test_DailyLimit_Emergency.set`).
 - All thresholds (pullback filters, Scalper Pro filters and exits) are placeholders, not calibrated.
@@ -116,11 +150,15 @@ Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE
 
 ## Next required action
 
-1. **Owner:** on the IC Markets demo, close the old robot and attach **`ALB_FOREX_SCALPER_PRO`** to
-   the XAUUSD M1 chart (panel line 3 must read `Entry: SCALPER PRO`). If other robots or manual
-   trades use the same account, set *Daily loss measured on = this robot only*.
-2. **Owner:** run `RUN_BACKTESTS.bat` (symbol `XAUUSD` for IC Markets) and send the zip from the
-   Desktop — first real backtest data for S_ScalperPro vs S_ScalperPro_NoM5 vs X_Crossover vs A_Baseline.
-3. Analyse: trades/day, win rate, average R, costs, rejection funnel; adjust one parameter at a time
-   on in-sample only; confirm once on 2026.09.01 → today (out-of-sample).
-4. Decide per TEST_PLAN rules: DEMO READY / RESEARCH NO-GO. No live trading before that.
+1. **Owner:** do not run Scalper Pro (or Crossover) with money that matters. On demo it only
+   repeats the measured loss. Remove it from the chart, or switch `TradingMode` to `ALERT_ONLY`.
+2. **Owner:** run `RUN_BACKTESTS.bat` once (symbol `XAUUSD` for IC Markets; it may run for hours,
+   overnight is fine). Send the zip from the Desktop.
+   - It tests **S_ScalperPro** (the control) and **H_CrossTrail** on the broker's real ticks,
+     2025.01.01 → 2026.11.01.
+3. **Analyse the zip:**
+   - If S_ScalperPro loses there too, the simulation is confirmed.
+   - **H** is a demo candidate only if it meets the TEST_PLAN T3 rules on real ticks (PF ≥ 1.2,
+     avg R > 0, DD ≤ 10 %, ≥ 100 trades, no single month > ½ of profit).
+   - Otherwise close the EMA 8/14 scalper line and research a different edge. Do not re-tune these
+     rules; the meta-analysis shows that tuning does not carry over to new data.

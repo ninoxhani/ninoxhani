@@ -1,0 +1,4 @@
+# built locally by download_data.sh / the scripts (not committed)
+xau_m1.npz
+*.json
+__pycache__/

@@ -1,5 +1,32 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
+## Research — 2026-11-11 (no EA code change; robots stay v1.21)
+
+Owner request after a losing demo day (13 trades, −3.46 USD): make the robot profitable.
+
+Result: **RESEARCH NO-GO** (proxy-data simulation). Full report:
+`reports/research/2026-11-11_proxy_research_report.md`.
+- **Scalper Pro v1.21:** loses in the simulation. 22 trades/day, −0.070R per trade, t = −6.2, all
+  10 months negative.
+- **Out-of-sample:** none of 3,360 tuned variants produced an edge that survived the test, so no
+  "profitable version" is shipped.
+- **False edge:** an apparent Asian-session edge was traced to Binance funding times and rejected.
+
+Added
+- `research/`: Python simulator of the robots' rules (`afx_bt.py`) on 1-minute data, with IC
+  Markets trading hours (server = New York + 7 h), an hourly spread model, commission and
+  slippage. Also the data loader, the download script and all experiment scripts.
+- `reports/research/`: report and the logs of every run.
+- Preset `Backtest_H_CrossTrail.set`: the best remaining hypothesis.
+  - Rules: Scalper Pro crosses only, no early exits, trailing stop 1.5 × ATR after +1R, 4R target.
+  - About break-even in the simulation; for the broker-data test only.
+
+Changed
+- **Runner defaults:** `RUN_BACKTESTS.bat` / `tools/run_backtests.ps1` now test **S_ScalperPro**
+  (control) and **H_CrossTrail** on 2025.01.01 → 2026.11.01 (real ticks). Other variants are
+  still available with `-Variants`. Checked with a PowerShell 7 dry run.
+- **Docs:** STATUS (readiness RESEARCH NO-GO), README, TEST_PLAN, CONFIGURATION.
+
 ## 1.21 — 2026-11-10 (day P/L fix)
 
 Both robots: **0 errors, 0 warnings** (MetaEditor 6308), self-tests **108 passed, 0 failed**.

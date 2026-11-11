@@ -1,0 +1,8 @@
+bars 329335 server days 240
+2026-01-16 UTC bars 1320 first 00:00 last 21:59 gaps: 
+2026-01-18 UTC bars 60 first 23:00 last 23:59 gaps: 
+2026-01-19 UTC bars 1380 first 00:00 last 23:59 gaps: 21:59->23:00
+2026-06-12 UTC bars 1260 first 00:00 last 20:59 gaps: 
+2026-06-14 UTC bars 120 first 22:00 last 23:59 gaps: 
+2026-06-15 UTC bars 1380 first 00:00 last 23:59 gaps: 20:59->22:00
+spread distribution: {0.1: 200695, 0.16: 114300, 0.25: 7170, 0.4: 7170}

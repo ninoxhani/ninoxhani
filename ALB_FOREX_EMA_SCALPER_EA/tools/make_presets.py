@@ -79,6 +79,18 @@ SCALPER = {
     "InpRewardRisk": "1.0",
 }
 
+CROSS_TRAIL = {
+    "InpScUseContinuation": "false",
+    "InpScExitOnSlowEMAClose": "false",
+    "InpScStaleBars": "0",
+    "InpCrossCloseOnOpposite": "false",
+    "InpScBreakEvenR": "0.0",
+    "InpEnableTrailingStop": "true",
+    "InpTrailStartR": "1.0",
+    "InpTrailDistanceATR": "1.5",
+    "InpRewardRisk": "4.0",
+}
+
 PRESETS = {
     "Backtest_A_Baseline": dict(BACKTEST),
     "Backtest_B_NextCandle": dict(BACKTEST, InpConfirmationMode="1"),
@@ -99,6 +111,10 @@ PRESETS = {
     "Backtest_S_ScalperPro_NoM5": dict(BACKTEST, **SCALPER_PRO, InpScTrendFilter="false"),
     "Demo_ScalperPro": dict({"InpTradingMode": "0", "InpEnableLiveTrading": "false",
                              "InpEnableNewsFilter": "true"}, **SCALPER_PRO),
+    # RESEARCH HYPOTHESIS H (2026-11-11, reports/research/): Scalper Pro with cross entries only,
+    # no early exits, trailing stop 1.5 x ATR(M1) after +1R, far 4R target. Break-even in the
+    # proxy-data simulation (+0.045R/trade, t = 1.3) - NOT proven profitable. Broker-data test only.
+    "Backtest_H_CrossTrail": {**BACKTEST, **SCALPER_PRO, **CROSS_TRAIL},
     "Demo_FullAuto": {"InpTradingMode": "0", "InpEnableLiveTrading": "false",
                       "InpEnableNewsFilter": "true"},
     "AlertOnly": {"InpTradingMode": "1", "InpEnableNewsFilter": "true"},

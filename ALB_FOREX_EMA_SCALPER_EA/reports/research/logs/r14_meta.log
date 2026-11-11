@@ -1,0 +1,41 @@
+variants with enough trades: 2249
+share profitable: IS 59%, OOS 30%
+correlation IS avgR vs OOS avgR across variants: -0.05
+best 50% by IS (avgR >= +0.015, n=1125): OOS median -0.027, OOS profitable 35%
+best 10% by IS (avgR >= +0.125, n=225): OOS median -0.064, OOS profitable 30%
+best 3% by IS (avgR >= +0.177, n=68): OOS median -0.088, OOS profitable 29%
+OOS avgR over all variants: median -0.033, p95 +0.097, max +0.316
+
+OOS median avg R by entry timeframe and management:
+   E1   be     IS median +0.004  OOS median -0.023  OOS>0 33%  (n=340)
+   E1   pure   IS median +0.005  OOS median -0.037  OOS>0 29%  (n=339)
+   E1   trail  IS median +0.033  OOS median +0.027  OOS>0 70%  (n=340)
+   E1   v121   IS median -0.015  OOS median -0.047  OOS>0 9%  (n=348)
+   E15  be     IS median +0.027  OOS median -0.085  OOS>0 6%  (n=33)
+   E15  pure   IS median +0.034  OOS median -0.103  OOS>0 9%  (n=32)
+   E15  trail  IS median +0.120  OOS median -0.090  OOS>0 0%  (n=32)
+   E15  v121   IS median +0.032  OOS median -0.105  OOS>0 3%  (n=38)
+   E5   be     IS median +0.045  OOS median -0.046  OOS>0 26%  (n=182)
+   E5   pure   IS median +0.033  OOS median -0.087  OOS>0 18%  (n=173)
+   E5   trail  IS median +0.058  OOS median -0.057  OOS>0 28%  (n=185)
+   E5   v121   IS median +0.013  OOS median -0.018  OOS>0 29%  (n=207)
+
+Top 10 by OOS (for information only - choosing from this list would be hindsight):
+   E1_T60_H240_cross_trail_rr2.0_LO       IS  152 +0.046  OOS  114 +0.316
+   E1_T60_H240_cross_be_rr3.0_LO          IS  149 +0.016  OOS  106 +0.310
+   E1_T60_H240_cross_trail_rr1.5_LO       IS  152 +0.055  OOS  114 +0.309
+   E1_T60_H240_cross_trail_rr3.0_LO       IS  152 +0.044  OOS  114 +0.305
+   E1_T60_H240_cross_trail_rr1.0_LO       IS  152 +0.032  OOS  114 +0.279
+   E1_T60_H0_cross_be_rr3.0_LO            IS  212 -0.021  OOS  165 +0.252
+   E1_T60_H240_cross_be_rr1.5_LO          IS  152 +0.060  OOS  113 +0.252
+   E1_T60_H240_cross_be_rr2.0_LO          IS  151 +0.038  OOS  111 +0.245
+   E1_T60_H240_cross_pure_rr1.5_LO        IS  150 +0.092  OOS  108 +0.237
+   E1_T60_H0_cross_trail_rr3.0_LO         IS  222 -0.026  OOS  174 +0.219
+
+Fixed original strategies (no tuning), Feb 1 - Nov 10 2026:
+   SCALPER PRO v1.21 defaults   ALL n= 4517 /day=22.25 win=47.2% avgR=-0.070 totR=  -316.0 PF=0.81 maxDD= 335.7R  long= -147.3 short= -168.7
+                                OOS n= 2025 /day=21.09 win=47.3% avgR=-0.088 totR=  -177.3 PF=0.77 maxDD= 188.3R  long= -100.0 short=  -77.3
+   PULLBACK baseline (robot 1)  ALL n=  979 /day= 4.82 win=39.2% avgR=-0.043 totR=   -42.6 PF=0.93 maxDD=  66.7R  long=  -19.8 short=  -22.8
+                                OOS n=  461 /day= 4.80 win=40.3% avgR=-0.023 totR=   -10.4 PF=0.96 maxDD=  35.9R  long=  +11.6 short=  -22.0
+   CROSSOVER v1.10              ALL n= 5396 /day=26.58 win=44.1% avgR=-0.077 totR=  -413.1 PF=0.84 maxDD= 427.8R  long= -305.0 short= -108.1
+                                OOS n= 2541 /day=26.47 win=44.5% avgR=-0.083 totR=  -211.6 PF=0.83 maxDD= 219.0R  long= -135.4 short=  -76.1

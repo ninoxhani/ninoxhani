@@ -1,0 +1,60 @@
+by trend TF
+   T15    IS med +0.023  OOS med +0.033  both>0 49%  trades(med) 1065  n=112
+   T5     IS med +0.032  OOS med +0.022  both>0 62%  trades(med) 1338  n=108
+   T60    IS med +0.046  OOS med +0.016  both>0 42%  trades(med) 1018  n=120
+by H4 filter
+   H0     IS med +0.019  OOS med +0.020  both>0 46%  trades(med) 1230  n=180
+   H240   IS med +0.046  OOS med +0.033  both>0 57%  trades(med) 774  n=160
+by entry kind
+   both   IS med +0.028  OOS med +0.026  both>0 52%  trades(med) 1297  n=120
+   cont   IS med +0.014  OOS med +0.012  both>0 38%  trades(med) 1152  n=120
+   cross  IS med +0.084  OOS med +0.074  both>0 65%  trades(med) 396  n=100
+by target
+   rr1.0  IS med +0.013  OOS med +0.001  both>0 27%  trades(med) 1070  n=85
+   rr1.5  IS med +0.042  OOS med +0.028  both>0 56%  trades(med) 1059  n=85
+   rr2.0  IS med +0.043  OOS med +0.036  both>0 59%  trades(med) 1058  n=85
+   rr3.0  IS med +0.042  OOS med +0.038  both>0 61%  trades(med) 1058  n=85
+by session
+   AS     IS med +0.041  OOS med +0.056  both>0 62%  trades(med) 907  n=68
+   LN     IS med +0.017  OOS med +0.027  both>0 44%  trades(med) 1274  n=72
+   LO     IS med -0.044  OOS med +0.040  both>0 22%  trades(med) 747  n=64
+   NY     IS med +0.077  OOS med -0.006  both>0 44%  trades(med) 740  n=64
+   all    IS med +0.040  OOS med +0.028  both>0 79%  trades(med) 2352  n=72
+
+E1 trail, no H4 filter, all sessions (EA-compatible):
+   E1_T15_H0_both_trail_rr1.0_all       IS 1856 -0.012 PF 0.98 | OOS 1497 -0.033 PF 0.94
+   E1_T15_H0_both_trail_rr1.5_all       IS 1844 +0.007 PF 1.01 | OOS 1471 +0.001 PF 1.00
+   E1_T15_H0_both_trail_rr2.0_all       IS 1841 +0.012 PF 1.02 | OOS 1460 +0.003 PF 1.01
+   E1_T15_H0_both_trail_rr3.0_all       IS 1825 +0.004 PF 1.01 | OOS 1460 +0.017 PF 1.03
+   E1_T15_H0_cont_trail_rr1.0_all       IS 1730 -0.021 PF 0.96 | OOS 1379 -0.058 PF 0.89
+   E1_T15_H0_cont_trail_rr1.5_all       IS 1722 +0.002 PF 1.00 | OOS 1358 -0.026 PF 0.95
+   E1_T15_H0_cont_trail_rr2.0_all       IS 1681 +0.004 PF 1.01 | OOS 1345 -0.022 PF 0.96
+   E1_T15_H0_cont_trail_rr3.0_all       IS 1682 -0.001 PF 1.00 | OOS 1338 -0.015 PF 0.97
+   E1_T15_H0_cross_trail_rr1.0_all      IS  780 +0.038 PF 1.08 | OOS  555 +0.023 PF 1.05
+   E1_T15_H0_cross_trail_rr1.5_all      IS  786 +0.047 PF 1.09 | OOS  558 +0.027 PF 1.05
+   E1_T15_H0_cross_trail_rr2.0_all      IS  786 +0.043 PF 1.09 | OOS  557 +0.027 PF 1.05
+   E1_T15_H0_cross_trail_rr3.0_all      IS  786 +0.044 PF 1.09 | OOS  557 +0.030 PF 1.06
+   E1_T5_H0_both_trail_rr1.0_all        IS 2182 +0.002 PF 1.00 | OOS 1860 +0.007 PF 1.01
+   E1_T5_H0_both_trail_rr1.5_all        IS 2213 +0.019 PF 1.04 | OOS 1842 +0.043 PF 1.09
+   E1_T5_H0_both_trail_rr2.0_all        IS 2223 +0.029 PF 1.06 | OOS 1831 +0.055 PF 1.11
+   E1_T5_H0_both_trail_rr3.0_all        IS 2215 +0.021 PF 1.04 | OOS 1818 +0.054 PF 1.11
+   E1_T5_H0_cont_trail_rr1.0_all        IS 2106 +0.001 PF 1.00 | OOS 1741 -0.002 PF 1.00
+   E1_T5_H0_cont_trail_rr1.5_all        IS 2064 +0.014 PF 1.03 | OOS 1712 +0.029 PF 1.06
+   E1_T5_H0_cont_trail_rr2.0_all        IS 2064 +0.019 PF 1.04 | OOS 1715 +0.038 PF 1.07
+   E1_T5_H0_cont_trail_rr3.0_all        IS 2063 +0.012 PF 1.02 | OOS 1701 +0.038 PF 1.07
+   E1_T5_H0_cross_trail_rr1.0_all       IS  690 +0.029 PF 1.06 | OOS  498 +0.025 PF 1.05
+   E1_T5_H0_cross_trail_rr1.5_all       IS  690 +0.050 PF 1.10 | OOS  497 +0.041 PF 1.08
+   E1_T5_H0_cross_trail_rr2.0_all       IS  690 +0.046 PF 1.09 | OOS  497 +0.043 PF 1.08
+   E1_T5_H0_cross_trail_rr3.0_all       IS  690 +0.045 PF 1.09 | OOS  497 +0.043 PF 1.08
+   E1_T60_H0_both_trail_rr1.0_all       IS 1750 +0.003 PF 1.01 | OOS 1555 -0.004 PF 0.99
+   E1_T60_H0_both_trail_rr1.5_all       IS 1799 +0.052 PF 1.10 | OOS 1543 +0.016 PF 1.03
+   E1_T60_H0_both_trail_rr2.0_all       IS 1764 +0.052 PF 1.10 | OOS 1523 +0.004 PF 1.01
+   E1_T60_H0_both_trail_rr3.0_all       IS 1752 +0.046 PF 1.09 | OOS 1528 +0.015 PF 1.03
+   E1_T60_H0_cont_trail_rr1.0_all       IS 1633 +0.016 PF 1.03 | OOS 1406 -0.024 PF 0.95
+   E1_T60_H0_cont_trail_rr1.5_all       IS 1662 +0.042 PF 1.08 | OOS 1415 +0.001 PF 1.00
+   E1_T60_H0_cont_trail_rr2.0_all       IS 1648 +0.043 PF 1.08 | OOS 1402 -0.009 PF 0.98
+   E1_T60_H0_cont_trail_rr3.0_all       IS 1640 +0.040 PF 1.08 | OOS 1402 +0.001 PF 1.00
+   E1_T60_H0_cross_trail_rr1.0_all      IS  797 -0.005 PF 0.99 | OOS  615 +0.074 PF 1.16
+   E1_T60_H0_cross_trail_rr1.5_all      IS  800 +0.007 PF 1.01 | OOS  618 +0.109 PF 1.23
+   E1_T60_H0_cross_trail_rr2.0_all      IS  799 +0.008 PF 1.02 | OOS  618 +0.093 PF 1.20
+   E1_T60_H0_cross_trail_rr3.0_all      IS  799 +0.012 PF 1.02 | OOS  618 +0.098 PF 1.21

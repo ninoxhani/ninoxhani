@@ -1,0 +1,24 @@
+WINTER Feb1-Mar7 (server=UTC+2)
+   UTC hour R/n: 0:+1/22 1:+9/23 2:-3/19 3:+5/15 4:-9/17 5:+9/15 6:+7/16 7:-3/15 8:-9/17 9:+2/14 10:-0/8 11:+5/15 12:-3/11 13:-0/12 14:+6/14 15:-9/13 16:-3/11 17:-1/5 18:+7/13 19:-1/9 20:-0/12 21:+2/13 23:+6/22
+SUMMER Mar8-Jun30 (server=UTC+3)
+   UTC hour R/n: 0:+6/80 1:+5/81 2:+4/58 3:-0/51 4:+6/56 5:+19/47 6:+16/58 7:+15/36 8:+19/51 9:-18/45 10:+8/35 11:+11/48 12:-6/37 13:-18/49 14:-5/36 15:+21/30 16:-9/28 17:-5/32 18:+9/26 19:-11/34 20:-8/23 22:-4/51 23:+57/91
+   00:00 UTC (Tokyo open + funding)     [ -60, -30) min: n=  64 R= +33.9 avg=+0.530
+   00:00 UTC (Tokyo open + funding)     [ -30,  +0) min: n=  49 R= +29.0 avg=+0.591
+   00:00 UTC (Tokyo open + funding)     [  +0, +30) min: n=  56 R= +18.4 avg=+0.329
+   00:00 UTC (Tokyo open + funding)     [ +30, +60) min: n=  46 R= -11.0 avg=-0.239
+   00:00 UTC (Tokyo open + funding)     [ +60,+120) min: n= 104 R= +13.8 avg=+0.133
+   08:00 UTC (funding, ~London open)    [ -60, -30) min: n=  23 R=  +8.3 avg=+0.361
+   08:00 UTC (funding, ~London open)    [ -30,  +0) min: n=  28 R=  +3.0 avg=+0.107
+   08:00 UTC (funding, ~London open)    [  +0, +30) min: n=  36 R=  +3.3 avg=+0.091
+   08:00 UTC (funding, ~London open)    [ +30, +60) min: n=  32 R=  +6.9 avg=+0.217
+   08:00 UTC (funding, ~London open)    [ +60,+120) min: n=  59 R= -16.2 avg=-0.275
+   16:00 UTC (funding)                  [ -60, -30) min: n=  24 R=  +7.5 avg=+0.313
+   16:00 UTC (funding)                  [ -30,  +0) min: n=  19 R=  +4.6 avg=+0.242
+   16:00 UTC (funding)                  [  +0, +30) min: n=  23 R=  +0.4 avg=+0.016
+   16:00 UTC (funding)                  [ +30, +60) min: n=  16 R= -12.1 avg=-0.758
+   16:00 UTC (funding)                  [ +60,+120) min: n=  37 R=  -5.9 avg=-0.159
+   01:00 UTC (Shanghai open)            [ -60, -30) min: n=  56 R= +18.4 avg=+0.329
+   01:00 UTC (Shanghai open)            [ -30,  +0) min: n=  46 R= -11.0 avg=-0.239
+   01:00 UTC (Shanghai open)            [  +0, +30) min: n=  58 R=  +4.9 avg=+0.084
+   01:00 UTC (Shanghai open)            [ +30, +60) min: n=  46 R=  +8.9 avg=+0.194
+   01:00 UTC (Shanghai open)            [ +60,+120) min: n=  77 R=  +1.0 avg=+0.013

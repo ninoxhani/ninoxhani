@@ -1,0 +1,16 @@
+variant                          trades/day   win avgR Feb-Jun avgR Jul-Nov  total R    PF  maxDD R
+v1.21 defaults                         22.3   47%       -0.056       -0.088   -316.0  0.81    335.7
+no slow-EMA close exit                 23.9   53%       -0.048       -0.041   -217.3  0.88    232.7
+no stale exit                          22.4   47%       -0.055       -0.083   -306.7  0.82    323.8
+no break-even                          20.7   39%       -0.052       -0.093   -296.4  0.83    317.2
+no early exits at all                  20.4   49%       -0.038       -0.039   -157.8  0.92    174.2
+target 2R                              21.3   47%       -0.011       -0.073   -167.0  0.90    213.4
+target 3R, no early exits              13.1   27%       +0.089       -0.010   +124.4  1.06     60.0
+cross entries only                      6.6   41%       -0.037       -0.068    -66.7  0.84     78.1
+continuation only                      22.2   49%       -0.051       -0.077   -282.8  0.83    299.1
+trend filter H1 instead of M5          20.0   47%       -0.037       -0.065   -201.6  0.86    222.3
+no flat filter                         26.4   48%       -0.043       -0.069   -292.8  0.85    303.2
+London+NY only (09-19 server)          14.0   47%       -0.044       -0.093   -186.5  0.82    203.5
+entries on M5, trend H1                 7.0   50%       +0.001       -0.022    -14.4  0.97     44.8
+entries on M15, trend H1                3.1   49%       +0.010       -0.078    -20.7  0.90     25.0
+H: cross + trailing stop                5.8   49%       +0.046       +0.043    +53.3  1.09     41.6

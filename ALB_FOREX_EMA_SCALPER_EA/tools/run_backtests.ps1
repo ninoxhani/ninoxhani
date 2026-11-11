@@ -4,9 +4,10 @@
   What it does (no MT5 clicks needed):
     1. Finds your MetaTrader 5 installation and data folder.
     2. Copies the EA (.ex5/.mq5) and the presets into MT5.
-    3. Runs the Strategy Tester once per variant, unattended. Default: S_ScalperPro (Scalper Pro),
-       S_ScalperPro_NoM5 (Scalper Pro without the M5 trend filter), X_Crossover (every M1 cross)
-       and A_Baseline (pullback). Others: -Variants X_CrossTrend,B_NextCandle,C_FlatFilter,D_BreakEven
+    3. Runs the Strategy Tester once per variant, unattended. Default (research check 2026-11-11,
+       2025.01.01 -> 2026.11.01 on the broker's real ticks): S_ScalperPro (current Scalper Pro, the
+       control) and H_CrossTrail (best research hypothesis: crosses only + trailing stop).
+       Others: -Variants S_ScalperPro_NoM5,X_Crossover,X_CrossTrend,A_Baseline,B_NextCandle,C_FlatFilter,D_BreakEven
     4. Collects every report, journal and log into ONE zip on your Desktop.
 
   Requirements:
@@ -21,11 +22,11 @@
 #>
 param(
     [string]   $Symbol   = "",
-    [string]   $From     = "2026.04.01",
-    [string]   $To       = "2026.08.31",
+    [string]   $From     = "2025.01.01",
+    [string]   $To       = "2026.11.01",
     [int]      $Deposit  = 10000,
     [int]      $Leverage = 100,
-    [string[]] $Variants = @("S_ScalperPro", "S_ScalperPro_NoM5", "X_Crossover", "A_Baseline"),
+    [string[]] $Variants = @("S_ScalperPro", "H_CrossTrail"),
     [string]   $AppData  = $env:APPDATA,
     [string]   $OutRoot  = [Environment]::GetFolderPath("Desktop"),
     [string]   $Login    = "",
@@ -183,7 +184,7 @@ foreach ($v in $Variants) {
     }
 
     Say ""
-    Say ("[{0}/{1}] Running variant {2} ... (can take 10-40 minutes; first run also downloads tick data)" -f $n, $Variants.Count, $v) "Cyan"
+    Say ("[{0}/{1}] Running variant {2} ... (can take 20-90 minutes; first run also downloads tick data)" -f $n, $Variants.Count, $v) "Cyan"
     $t0 = Get-Date
     if ($DryRun) {
         Say "  (dry run) would start: `"$exe`" /config:`"$ini`""

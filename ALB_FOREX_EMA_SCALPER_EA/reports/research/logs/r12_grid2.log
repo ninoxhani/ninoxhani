@@ -1,0 +1,95 @@
+configs: 3360
+with >=120 IS trades: 2025  positive in both halves: 600
+IS avg R over configs: pct5 -0.097 median 0.000 pct95 0.137 max 0.345
+
+Top 40 by the worse half's avg R:
+E15_T60_H240_cont_trail_rr3.0_all      IS1   73 +0.308 | IS2   86 +0.377 | IS   +54.9R PF 1.71 DD   8.0 /day 1.47
+E15_T60_H240_cont_trail_rr2.0_all      IS1   73 +0.267 | IS2   86 +0.326 | IS   +47.5R PF 1.61 DD   8.0 /day 1.47
+E15_T60_H240_cont_pure_rr3.0_all       IS1   60 +0.260 | IS2   71 +0.373 | IS   +42.1R PF 1.47 DD  13.1 /day 1.21
+E5_T60_H240_cont_pure_rr3.0_all        IS1  107 +0.259 | IS2  132 +0.316 | IS   +69.4R PF 1.42 DD   9.6 /day 2.21
+E15_T60_H0_cont_trail_rr3.0_all        IS1  105 +0.269 | IS2  120 +0.246 | IS   +57.8R PF 1.54 DD   7.7 /day 2.08
+E15_T60_H240_cont_trail_rr1.5_all      IS1   73 +0.236 | IS2   86 +0.283 | IS   +41.6R PF 1.54 DD   8.5 /day 1.47
+E15_T60_H0_both_pure_rr3.0_all         IS1   83 +0.295 | IS2   92 +0.232 | IS   +45.8R PF 1.38 DD  19.1 /day 1.62
+E15_T60_H240_both_trail_rr3.0_all      IS1   79 +0.224 | IS2   87 +0.357 | IS   +48.8R PF 1.59 DD   9.2 /day 1.54
+E15_T60_H0_cont_trail_rr2.0_all        IS1  105 +0.240 | IS2  120 +0.210 | IS   +50.4R PF 1.47 DD   7.7 /day 2.08
+E5_T60_H240_both_pure_rr3.0_all        IS1  115 +0.207 | IS2  139 +0.280 | IS   +62.7R PF 1.35 DD  13.7 /day 2.35
+E15_T60_H0_cont_pure_rr3.0_all         IS1   80 +0.244 | IS2   94 +0.206 | IS   +38.8R PF 1.32 DD  18.1 /day 1.61
+E15_T60_H0_both_trail_rr3.0_all        IS1  111 +0.200 | IS2  121 +0.234 | IS   +50.6R PF 1.45 DD   9.7 /day 2.15
+E15_T60_H240_both_be_rr3.0_all         IS1   71 +0.214 | IS2   82 +0.196 | IS   +31.2R PF 1.41 DD  13.6 /day 1.42
+E15_T60_H240_both_trail_rr2.0_all      IS1   79 +0.186 | IS2   87 +0.313 | IS   +41.9R PF 1.51 DD   9.2 /day 1.54
+E15_T60_H0_cont_trail_rr1.5_all        IS1  105 +0.235 | IS2  120 +0.185 | IS   +46.9R PF 1.44 DD   7.7 /day 2.08
+E5_T60_H0_cont_pure_rr3.0_all          IS1  154 +0.184 | IS2  176 +0.213 | IS   +65.8R PF 1.28 DD  17.0 /day 3.06
+E15_T60_H240_both_pure_rr3.0_all       IS1   64 +0.181 | IS2   69 +0.413 | IS   +40.0R PF 1.44 DD  14.1 /day 1.23
+E15_T60_H0_both_trail_rr2.0_all        IS1  111 +0.173 | IS2  121 +0.202 | IS   +43.7R PF 1.39 DD   9.7 /day 2.15
+E15_T60_H0_both_trail_rr1.5_all        IS1  111 +0.168 | IS2  121 +0.190 | IS   +41.6R PF 1.37 DD   9.7 /day 2.15
+E15_T60_H240_cont_be_rr3.0_all         IS1   67 +0.303 | IS2   83 +0.168 | IS   +34.2R PF 1.46 DD  16.7 /day 1.39
+E5_T60_H240_both_v121_rr3.0_AS         IS1   60 +0.163 | IS2   66 +0.214 | IS   +23.9R PF 1.65 DD   5.1 /day 1.17
+E15_T60_H240_both_v121_rr3.0_all       IS1   92 +0.224 | IS2  102 +0.158 | IS   +36.7R PF 1.60 DD   6.7 /day 1.80
+E5_T60_H240_both_trail_rr3.0_all       IS1  158 +0.157 | IS2  196 +0.294 | IS   +82.4R PF 1.49 DD  11.1 /day 3.28
+E15_T60_H240_both_trail_rr1.5_all      IS1   79 +0.157 | IS2   87 +0.287 | IS   +37.4R PF 1.45 DD   9.2 /day 1.54
+E5_T60_H240_cont_trail_rr3.0_all       IS1  139 +0.157 | IS2  176 +0.352 | IS   +83.7R PF 1.56 DD   9.4 /day 2.92
+E5_T60_H240_cross_trail_rr3.0_all      IS1   55 +0.180 | IS2   65 +0.156 | IS   +20.0R PF 1.35 DD   7.1 /day 1.11
+E5_T60_H240_both_trail_rr3.0_LN        IS1   66 +0.164 | IS2   89 +0.150 | IS   +24.2R PF 1.34 DD   7.3 /day 1.44
+E15_T60_H240_cont_v121_rr3.0_all       IS1   84 +0.244 | IS2   96 +0.145 | IS   +34.5R PF 1.61 DD   8.5 /day 1.67
+E15_T60_H240_cont_pure_rr1.5_all       IS1   67 +0.151 | IS2   83 +0.145 | IS   +22.1R PF 1.27 DD  10.8 /day 1.39
+E5_T60_H0_both_pure_rr3.0_all          IS1  163 +0.144 | IS2  183 +0.189 | IS   +58.1R PF 1.24 DD  24.9 /day 3.20
+E15_T60_H0_both_be_rr3.0_all           IS1  100 +0.210 | IS2  109 +0.139 | IS   +36.2R PF 1.36 DD  12.5 /day 1.94
+E5_T60_H240_both_be_rr3.0_all          IS1  143 +0.139 | IS2  163 +0.151 | IS   +44.4R PF 1.31 DD  14.1 /day 2.83
+E5_T60_H240_cross_trail_rr1.5_all      IS1   55 +0.194 | IS2   65 +0.137 | IS   +19.5R PF 1.34 DD   7.1 /day 1.11
+E5_T60_H240_cont_be_rr3.0_all          IS1  129 +0.136 | IS2  150 +0.239 | IS   +53.4R PF 1.42 DD  13.0 /day 2.58
+E5_T60_H240_both_pure_rr2.0_LN         IS1   64 +0.162 | IS2   81 +0.135 | IS   +21.4R PF 1.24 DD  10.3 /day 1.34
+E15_T60_H0_cont_trail_rr1.0_all        IS1  105 +0.148 | IS2  122 +0.135 | IS   +32.1R PF 1.30 DD   7.9 /day 2.10
+E5_T60_H240_cont_trail_rr3.0_LN        IS1   60 +0.143 | IS2   82 +0.134 | IS   +19.6R PF 1.29 DD   6.6 /day 1.31
+E5_T60_H240_cross_trail_rr2.0_all      IS1   55 +0.186 | IS2   65 +0.134 | IS   +19.0R PF 1.33 DD   7.1 /day 1.11
+E5_T15_H0_cont_pure_rr2.0_AS           IS1   92 +0.131 | IS2  102 +0.162 | IS   +28.6R PF 1.24 DD   9.2 /day 1.80
+E15_T60_H0_cont_pure_rr1.5_all         IS1  101 +0.182 | IS2  117 +0.131 | IS   +33.7R PF 1.29 DD   9.0 /day 2.02
+
+Median IS avg R by entry TF / management / RR (all sessions/kinds/trends pooled):
+   ('E1', 'be', 'rr1.0'): median -0.042  share>0 24%  (n=82)
+   ('E1', 'be', 'rr1.5'): median -0.030  share>0 27%  (n=82)
+   ('E1', 'be', 'rr2.0'): median -0.009  share>0 35%  (n=82)
+   ('E1', 'be', 'rr3.0'): median +0.024  share>0 65%  (n=81)
+   ('E1', 'pure', 'rr1.0'): median -0.042  share>0 24%  (n=82)
+   ('E1', 'pure', 'rr1.5'): median -0.027  share>0 25%  (n=81)
+   ('E1', 'pure', 'rr2.0'): median -0.004  share>0 42%  (n=80)
+   ('E1', 'pure', 'rr3.0'): median +0.031  share>0 65%  (n=79)
+   ('E1', 'trail', 'rr1.0'): median -0.006  share>0 43%  (n=82)
+   ('E1', 'trail', 'rr1.5'): median +0.012  share>0 65%  (n=82)
+   ('E1', 'trail', 'rr2.0'): median +0.017  share>0 63%  (n=82)
+   ('E1', 'trail', 'rr3.0'): median +0.023  share>0 63%  (n=82)
+   ('E1', 'v121', 'rr1.0'): median -0.048  share>0 12%  (n=83)
+   ('E1', 'v121', 'rr1.5'): median -0.034  share>0 16%  (n=83)
+   ('E1', 'v121', 'rr2.0'): median -0.020  share>0 30%  (n=83)
+   ('E1', 'v121', 'rr3.0'): median +0.005  share>0 54%  (n=83)
+   ('E15', 'be', 'rr1.0'): median +0.015  share>0 100%  (n=8)
+   ('E15', 'be', 'rr1.5'): median +0.061  share>0 100%  (n=7)
+   ('E15', 'be', 'rr2.0'): median +0.097  share>0 100%  (n=6)
+   ('E15', 'be', 'rr3.0'): median +0.182  share>0 100%  (n=6)
+   ('E15', 'pure', 'rr1.0'): median +0.015  share>0 100%  (n=8)
+   ('E15', 'pure', 'rr1.5'): median +0.118  share>0 100%  (n=7)
+   ('E15', 'pure', 'rr2.0'): median +0.128  share>0 100%  (n=6)
+   ('E15', 'pure', 'rr3.0'): median +0.242  share>0 100%  (n=6)
+   ('E15', 'trail', 'rr1.0'): median +0.124  share>0 100%  (n=7)
+   ('E15', 'trail', 'rr1.5'): median +0.202  share>0 100%  (n=7)
+   ('E15', 'trail', 'rr2.0'): median +0.224  share>0 100%  (n=7)
+   ('E15', 'trail', 'rr3.0'): median +0.257  share>0 100%  (n=7)
+   ('E15', 'v121', 'rr1.0'): median +0.031  share>0 88%  (n=8)
+   ('E15', 'v121', 'rr1.5'): median +0.078  share>0 100%  (n=8)
+   ('E15', 'v121', 'rr2.0'): median +0.092  share>0 100%  (n=8)
+   ('E15', 'v121', 'rr3.0'): median +0.129  share>0 100%  (n=8)
+   ('E5', 'be', 'rr1.0'): median +0.003  share>0 56%  (n=39)
+   ('E5', 'be', 'rr1.5'): median +0.011  share>0 56%  (n=39)
+   ('E5', 'be', 'rr2.0'): median +0.048  share>0 75%  (n=36)
+   ('E5', 'be', 'rr3.0'): median +0.023  share>0 56%  (n=32)
+   ('E5', 'pure', 'rr1.0'): median +0.003  share>0 56%  (n=39)
+   ('E5', 'pure', 'rr1.5'): median +0.028  share>0 60%  (n=35)
+   ('E5', 'pure', 'rr2.0'): median +0.051  share>0 81%  (n=31)
+   ('E5', 'pure', 'rr3.0'): median +0.038  share>0 57%  (n=28)
+   ('E5', 'trail', 'rr1.0'): median +0.028  share>0 61%  (n=38)
+   ('E5', 'trail', 'rr1.5'): median +0.035  share>0 63%  (n=38)
+   ('E5', 'trail', 'rr2.0'): median +0.052  share>0 68%  (n=38)
+   ('E5', 'trail', 'rr3.0'): median +0.072  share>0 76%  (n=38)
+   ('E5', 'v121', 'rr1.0'): median -0.006  share>0 47%  (n=43)
+   ('E5', 'v121', 'rr1.5'): median +0.007  share>0 53%  (n=43)
+   ('E5', 'v121', 'rr2.0'): median +0.023  share>0 63%  (n=43)
+   ('E5', 'v121', 'rr3.0'): median +0.013  share>0 55%  (n=42)

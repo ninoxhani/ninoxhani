@@ -22,10 +22,14 @@ after 10 bars, 3-bar cooldown after a loss, 60-minute pause after 3 losses in a 
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
 - Also available via `EntryMode`: `CROSSOVER` (v1.10, every M1 cross, simple ATR stop).
 
-> **Status: NOT VALIDATED.** Both robots compile with 0 errors / 0 warnings (MetaEditor build 6308)
-> and pass their 108 logic self-tests, but no
-> backtest has been run yet and there is no evidence of a
-> positive edge. Do not trade real money with it. See [STATUS.md](STATUS.md).
+> **Status: RESEARCH NO-GO (2026-11-11).** Both robots compile with 0 errors / 0 warnings
+> (MetaEditor build 6308) and pass their 108 logic self-tests.
+> - **Simulation result:** 9 months of 1-minute gold data with broker costs. The Scalper Pro
+>   defaults **lose** (−0.07R per trade, about 22 trades/day, every month negative). No tuned
+>   variant passed an out-of-sample test.
+> - **Do not trade real money with these robots.**
+> - Evidence: [research report](reports/research/2026-11-11_proxy_research_report.md) and [STATUS.md](STATUS.md).
+>   Confirmation on the broker's real ticks: run `RUN_BACKTESTS.bat` (section 6a).
 
 This project is independent. It does **not** change or share code with the ALB FOREX
 Supply & Demand EA, Tradivo ProShi, EAGLE or any TradingView indicator.
@@ -48,6 +52,7 @@ ALB_FOREX_EMA_SCALPER_EA/
 ├── ALB_FOREX_EMA_SCALPER_EA.mq5   baseline source (defaults only)
 ├── ALB_FOREX_EMA_CORE.mqh         shared core: all strategy, risk and execution code
 ├── presets/                       .set files for each research variant and test
+├── research/                      Python simulator + experiment scripts (proxy-data research)
 ├── tests/                         Strategy Tester .ini configs (command-line backtests)
 ├── reports/                       put tester reports here (empty until tests are run)
 ├── RUN_BACKTESTS.bat              one-click: runs the test variants in MT5 and zips the results
@@ -118,16 +123,17 @@ entries today, news-filter status, open position and the last evaluation result.
 2. Double-click **`RUN_BACKTESTS.bat`** in this folder. (If Windows SmartScreen warns:
    *More info → Run anyway*.)
 3. Type your gold symbol when asked (Enter = `XAUUSD`, e.g. IC Markets; Lirunex = `XAUUSD.std`).
-4. Wait. It runs S_ScalperPro, S_ScalperPro_NoM5, X_Crossover and A_Baseline one after another
-   on that symbol, M1, real ticks, 2026.04.01 → 2026.08.31, deposit 10 000 USD. The first run also
-   downloads tick data. The PC must stay on.
+4. Wait. It runs **S_ScalperPro** (the current Scalper Pro, control) and **H_CrossTrail** (best
+   research hypothesis, see the research report) one after another on that symbol, M1, real ticks,
+   2025.01.01 → 2026.11.01, deposit 10 000 USD. This can take several hours (overnight is fine).
+   The first run also downloads tick data. The PC must stay on.
    If a run fails, the script prints MT5's own reason, stops, and (if MT5 did not use your broker
    account) lets you type your account number to retry. Your password must be saved in MT5.
 5. At the end a single file `ALBFX_Backtests_<date>.zip` appears on your Desktop with every
    report, journal and log. Send that file for analysis.
 
-Other symbol or dates: `powershell -ExecutionPolicy Bypass -File tools\run_backtests.ps1 -Symbol XAUUSD -From 2026.04.01 -To 2026.08.31`.
-The out-of-sample period (2026.09.01 onward) is deliberately not part of the default run.
+Other symbol, dates or variants: `powershell -ExecutionPolicy Bypass -File tools\run_backtests.ps1 -Symbol XAUUSD -From 2025.01.01 -To 2026.11.01 -Variants S_ScalperPro,H_CrossTrail,A_Baseline`.
+No parameter was tuned on broker data, so the whole default period is a fresh test for both variants.
 
 ### 6b. Manually
 
