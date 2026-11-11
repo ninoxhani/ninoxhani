@@ -16,7 +16,7 @@
 | Edge cases T2 | ⬜ not run |
 | Research backtests T3 — **proxy data** | ❌ **done 2026-11-11 → NO-GO**: [`reports/research/2026-11-11_proxy_research_report.md`](reports/research/2026-11-11_proxy_research_report.md) |
 | Research backtests T3 — broker real ticks (MT5 tester) | ⬜ pending — `RUN_BACKTESTS.bat` is set up for it (S_ScalperPro vs H_CrossTrail, 2025.01.01 → 2026.11.01) |
-| Demo forward test T4 | 🔶 owner demo (IC Markets) — 2026-11-11: 13 trades, −3.46 USD, consistent with the simulation |
+| Demo forward test T4 | 🔶 owner demo (IC Markets) — full day 2026-11-11: 17 trades (W7 L10), −3.31 USD (−0.66 %), consistent with the simulation |
 | **Overall** | **RESEARCH NO-GO** — the Scalper Pro defaults lose in simulation with high confidence and no tuned variant passed out-of-sample. Not for real money. |
 
 ## Research result (2026-11-11, proxy-data simulation — not the MT5 tester)
@@ -100,9 +100,13 @@ Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE
 - **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.21: 0/0 and 108/108, both robots).
 - **T3 proxy-data research (2026-11-11):** NO-GO. See the section above and
   `reports/research/` (report and logs of every run).
-- **Owner demo day, 2026-11-11 (IC Markets demo, Scalper Pro v1.21, 500 USD):**
-  - 13 trades: 5 winners, 8 losers; 1.26 USD commission; balance 500 → 496.54 (−0.7 %).
-  - The simulation's average day for v1.21 is about −0.8 %.
+- **Owner demo, full day 2026-11-11 (IC Markets demo, Scalper Pro v1.21, 500 USD):**
+  - 17 trades: 7 wins (+9.43), 10 losses (−11.32), gross −1.89; commission −1.42; net −3.31 USD
+    (−0.66 % ≈ −1.3R). The simulation expects about −1.2R for 17 trades.
+  - The commission is 0.08 per 0.01 lot round trip (0.035 per side, rounded), not the 0.07 the
+    research assumed, so real micro-lot costs are slightly higher than simulated.
+  - The panel showed `Day P/L −0.66% (−3.31)`, matching the account to the cent. This is a
+    single-day live check of the v1.20/v1.21 daily-loss model.
 - **Owner demo, 2026-11-10 ~20:25 server (IC Markets demo 53134733, v1.20 Scalper Pro on XAUUSD):** robot
   active and evaluating (`Entry: SCALPER PRO`, executing, live news OK, no halt), 0 trades yet.
   Panel `Day P/L +0.56` vs account +0.28: a position open at the robot's start was counted twice by

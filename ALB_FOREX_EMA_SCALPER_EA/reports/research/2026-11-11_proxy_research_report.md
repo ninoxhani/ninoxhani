@@ -11,8 +11,11 @@
 
 ## 1. Why this research
 
-- **Owner's demo day, 2026-11-11:** IC Markets demo, Scalper Pro v1.21, 500 USD account. 13 trades,
-  net −3.46 USD (−0.7 %, ≈ −1.4R at 0.5 % risk). Request: *"turn that in profitable"*.
+- **Owner's demo day, 2026-11-11:** IC Markets demo, Scalper Pro v1.21, 500 USD account.
+  - Mid-day snapshot: 13 trades, −3.46 USD.
+  - Full day: 17 trades (7 wins, 10 losses), net −3.31 USD (−0.66 %, ≈ −1.3R at 0.5 % risk), of
+    which 1.42 USD was commission.
+  - Request: *"turn that in profitable"*.
 - **Earlier owner runs:** 3 winning trades on 2026-11-10, too small a sample to mean anything.
 - **MT5 tester:** no tester report exists (the tester needs the broker account, see STATUS.md).
 
@@ -210,7 +213,8 @@ parameter was tuned on broker data, so the whole period is a fresh test for both
   others may exist.
 - **Short history.** Only 9 months of clean data: one main regime per half-period.
 - **Simplified costs.** Spreads are fixed per hour, not tick spreads; there is no swap and no
-  requotes.
+  requotes. IC Markets actually charges 0.08 per 0.01 lot round trip (rounding), 14 % more than
+  the 0.07 simulated, so real micro-lot results are slightly worse than shown.
 - **No news filter.** The EA blocks ±15 min around high-impact USD news; the simulation does not.
 - **Fills from 1-minute candles,** not from the tick path.
 - **Re-implementation.** The simulator re-implements the EA. It was checked against the source rule
