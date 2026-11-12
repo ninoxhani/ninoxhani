@@ -63,7 +63,8 @@ BACKTEST = {
     "InpWriteTesterReport": "true",
 }
 
-# SCALPER PRO: same settings as the ALB_FOREX_SCALPER_PRO robot (own magic number)
+# SCALPER PRO as it was up to v1.22 (1R target, BE 0.6R, stale/EMA exits, crosses + continuations):
+# kept as the control variant S. The robot's own defaults changed in v1.30 (see SCALPER_PRO_V130).
 SCALPER_PRO = {
     "InpEntryMode": "2",
     "InpMaxTradesPerDay": "0",
@@ -79,17 +80,22 @@ SCALPER = {
     "InpRewardRisk": "1.0",
 }
 
+# Defaults of the ALB_FOREX_SCALPER_PRO robot from v1.30 (owner request 2026-11-12: let winners run,
+# RR >= 1:3, protect trades in profit) = research hypothesis H + profit lock at +1R:
+# crosses only, no early exits, at +1R the stop locks +0.25R and trails 1.5 x ATR(M1), 4R target.
 CROSS_TRAIL = {
     "InpScUseContinuation": "false",
     "InpScExitOnSlowEMAClose": "false",
     "InpScStaleBars": "0",
     "InpCrossCloseOnOpposite": "false",
-    "InpScBreakEvenR": "0.0",
+    "InpScBreakEvenR": "1.0",
+    "InpScBreakEvenLockR": "0.25",
     "InpEnableTrailingStop": "true",
     "InpTrailStartR": "1.0",
     "InpTrailDistanceATR": "1.5",
     "InpRewardRisk": "4.0",
 }
+SCALPER_PRO_V130 = {**SCALPER_PRO, **CROSS_TRAIL, "InpOrderComment": "ALBFX_SCP4R"}
 
 PRESETS = {
     "Backtest_A_Baseline": dict(BACKTEST),
@@ -109,12 +115,11 @@ PRESETS = {
     # SCALPER PRO (v1.20)
     "Backtest_S_ScalperPro": dict(BACKTEST, **SCALPER_PRO),
     "Backtest_S_ScalperPro_NoM5": dict(BACKTEST, **SCALPER_PRO, InpScTrendFilter="false"),
-    "Demo_ScalperPro": dict({"InpTradingMode": "0", "InpEnableLiveTrading": "false",
-                             "InpEnableNewsFilter": "true"}, **SCALPER_PRO),
-    # RESEARCH HYPOTHESIS H (2026-11-11, reports/research/): Scalper Pro with cross entries only,
-    # no early exits, trailing stop 1.5 x ATR(M1) after +1R, far 4R target. Break-even in the
-    # proxy-data simulation (+0.045R/trade, t = 1.3) - NOT proven profitable. Broker-data test only.
-    "Backtest_H_CrossTrail": {**BACKTEST, **SCALPER_PRO, **CROSS_TRAIL},
+    "Demo_ScalperPro": {"InpTradingMode": "0", "InpEnableLiveTrading": "false",
+                        "InpEnableNewsFilter": "true", **SCALPER_PRO_V130},
+    # H = Scalper Pro v1.30 defaults (see CROSS_TRAIL). About break-even to slightly positive in the
+    # proxy-data simulation (+0.04R/trade, t = 1.2) - NOT proven profitable.
+    "Backtest_H_CrossTrail": {**BACKTEST, **SCALPER_PRO_V130},
     "Demo_FullAuto": {"InpTradingMode": "0", "InpEnableLiveTrading": "false",
                       "InpEnableNewsFilter": "true"},
     "AlertOnly": {"InpTradingMode": "1", "InpEnableNewsFilter": "true"},

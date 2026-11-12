@@ -1,6 +1,6 @@
 # STATUS — ALB FOREX EMA 8/14 EAs (baseline + Scalper Pro)
 
-**Version:** 1.22 · **Updated:** 2026-11-11 · **Readiness: RESEARCH NO-GO** (proxy-data simulation; broker-data confirmation pending)
+**Version:** 1.30 · **Updated:** 2026-11-12 · **Readiness: INCOMPLETE** — v1.30 is a research candidate for demo only; the old Scalper Pro defaults (≤ v1.22) are **RESEARCH NO-GO**
 
 > Read this file first when resuming work. It separates what is implemented, what is verified
 > with evidence, and what is still open. Never upgrade a status without evidence in `reports/`.
@@ -10,14 +10,14 @@
 | Gate | Status |
 |---|---|
 | Source implemented | ✅ done — two robots over one core (`ALB_FOREX_EMA_CORE.mqh`) |
-| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.22, both robots) — `reports/compile/2026-11-11_v1.22_compile.log` |
-| Self-tests pass (108 checks) | ✅ **VERIFIED** (v1.22, both robots) — `reports/selftest/2026-11-11_v1.22_selftest_experts.log` |
+| Compiles with 0 errors / 0 warnings | ✅ **VERIFIED** (v1.30, both robots) — `reports/compile/2026-11-12_v1.30_compile.log` |
+| Self-tests pass (115 checks) | ✅ **VERIFIED** (v1.30, both robots) — `reports/selftest/2026-11-12_v1.30_selftest_experts.log` |
 | Functional backtests T1 | ⬜ not done — the owner's runs so far: see "Test results" |
 | Edge cases T2 | ⬜ not run |
 | Research backtests T3 — **proxy data** | ❌ **done 2026-11-11 → NO-GO**: [`reports/research/2026-11-11_proxy_research_report.md`](reports/research/2026-11-11_proxy_research_report.md) |
-| Research backtests T3 — broker real ticks (MT5 tester) | ⬜ pending — first owner run (v1.21, MetaQuotes-Demo) made **0 trades because of an EA defect**, fixed in v1.22 → re-run `RUN_BACKTESTS.bat` (S_ScalperPro vs H_CrossTrail, 2025.01.01 → 2026.11.01) |
+| Research backtests T3 — broker real ticks (MT5 tester) | ⬜ pending — first owner run (v1.21, MetaQuotes-Demo) made **0 trades because of an EA defect**, fixed in v1.22 → re-run `RUN_BACKTESTS.bat` (S_ScalperPro = old defaults vs H_CrossTrail = v1.30 defaults, 2025.01.01 → 2026.11.01) |
 | Demo forward test T4 | 🔶 owner demo (IC Markets) — full day 2026-11-11: 17 trades (W7 L10), −3.31 USD (−0.66 %), consistent with the simulation |
-| **Overall** | **RESEARCH NO-GO** — the Scalper Pro defaults lose in simulation with high confidence and no tuned variant passed out-of-sample. Not for real money. |
+| **Overall** | **INCOMPLETE** — v1.30 (crosses, 1:4, profit lock + trailing) is about +0.04R/trade in simulation, not statistically proven; demo only until the broker-data run. The old defaults lose with high confidence (RESEARCH NO-GO). Not for real money. |
 
 ## Research result (2026-11-11, proxy-data simulation — not the MT5 tester)
 
@@ -48,11 +48,24 @@
 
 | File | Opens in | Magic |
 |---|---|---|
-| `ALB_FOREX_SCALPER_PRO.ex5` | SCALPER PRO (STRATEGY_SPEC §18), unlimited trades, 1R | 81420262 |
+| `ALB_FOREX_SCALPER_PRO.ex5` | SCALPER PRO with the v1.30 defaults (STRATEGY_SPEC §18.1): crosses only, 1:4 target, profit lock +0.25R at +1R, trailing 1.5 ATR, unlimited trades | 81420262 |
 | `ALB_FOREX_EMA_SCALPER_EA.ex5` | PULLBACK baseline (§4–§9), max 5/day, 1.5R | 81420261 |
 
 ## Completed implementation
 
+- **v1.30** (2026-11-12, owner request "let each position run, RR at least 1:3, don't come out
+  badly on losses"):
+  - New Scalper Pro defaults = research hypothesis H plus a profit lock (STRATEGY_SPEC §18.1):
+    - crosses only, no early exits;
+    - 1:4 target;
+    - at +1R the stop locks +0.25R, then trails 1.5 × ATR(M1).
+  - Per-robot default macros (`AFX_DEF_SC_*`, `AFX_DEF_TRAIL*`, `AFX_DEF_CLOSE_OPPOSITE`); the
+    baseline robot is unchanged.
+  - Pure `AfxManagedStop` plus 7 self-tests (115 total).
+  - Trailing moves in steps of at least 10 % of the trail distance; dashboard line 4 shows the exit
+    setup.
+  - Order comment `ALBFX_SCP4R`. Presets: H = v1.30 defaults, S = old defaults (control),
+    Demo_ScalperPro = v1.30.
 - **v1.22** (2026-11-11): Strategy Tester fix.
   - The owner's first non-visual tester run made 0 trades: every bar was rejected as
     `DATA_NOT_READY`.
@@ -87,14 +100,16 @@
 
 | What | Evidence | Scope |
 |---|---|---|
-| **Both robots compile: 0 errors, 0 warnings** | `reports/compile/2026-11-10_v1.21_compile.log` (MetaEditor64 5.0.0.6308; SHA-256 of all sources and binaries inside) | compilation only |
-| **108 self-tests pass at runtime, both robots** — patterns, swings, rounding, TP, sizing, spread, drift, flat filter, day boundary, sessions, news parsing, crossover, scalper leg/momentum/stop/break-even/stale/EMA exit/loss streak, daily-loss model incl. the deposit cases | `reports/selftest/2026-11-10_v1.21_selftest_experts.log` | pure logic functions only |
-| Both robots start and stop cleanly; Scalper Pro opens in SCALPER PRO mode, magic 81420262, unlimited trades; presets are read (108 inputs) | same log | EURUSD sample chart, no broker account, no ticks |
-| Earlier versions: compile + self-tests v1.00 (72/72), v1.01 (74/74), v1.10 (80/80), v1.20 (105/105) | `reports/compile/`, `reports/selftest/` | history |
+| **Both robots compile: 0 errors, 0 warnings** | `reports/compile/2026-11-12_v1.30_compile.log` (MetaEditor64 5.0.0.6308; SHA-256 of all sources and binaries inside) | compilation only |
+| **115 self-tests pass at runtime, both robots** — patterns, swings, rounding, TP, sizing, spread, drift, flat filter, day boundary, sessions, news parsing, crossover, scalper leg/momentum/stop/break-even/stale/EMA exit/loss streak, daily-loss model incl. the deposit cases, v1.30 profit lock + trailing stop (`AfxManagedStop`) | `reports/selftest/2026-11-12_v1.30_selftest_experts.log` | pure logic functions only |
+| Both robots start and stop cleanly; Scalper Pro opens in SCALPER PRO mode with the v1.30 defaults (dashboard: `Entry: SCALPER PRO X \| M5 ON \| BE 1.0R trail 1.5ATR \| RR 4.0`), magic 81420262 | same log + `reports/selftest/2026-11-12_v1.30_dashboard.png` | EURUSD sample chart, no broker account, no ticks |
+| Earlier versions: compile + self-tests v1.00 (72/72), v1.01 (74/74), v1.10 (80/80), v1.20 (105/105), v1.21/v1.22 (108/108) | `reports/compile/`, `reports/selftest/` | history |
 | Live calendar news filter works on a broker demo | owner screenshots 2026-11-09 (Lirunex) and 2026-11-10 (IC Markets) | live path only |
 
-**Not yet verified:** Scalper Pro trading behaviour (entries, BE/stale/EMA exits, cooldown/pause) on
-ticks, the new daily-loss model on a live account, and any backtest performance.
+**Not yet verified:**
+- the v1.30 profit lock and trailing stop on live ticks or in the Strategy Tester (the trailing stop
+  has never traded before v1.30);
+- any MT5 backtest performance.
 
 ## Compilation status
 
@@ -105,7 +120,16 @@ Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE
 
 ## Test results
 
-- **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.22: 0/0 and 108/108, both robots).
+- **T0.1 compile / T0.2 self-tests:** PASSED for every version (latest v1.30: 0/0 and 115/115, both robots).
+- **v1.30 simulation (proxy data, Feb–Nov 2026, commission 0.08 per 0.01 lot):**
+  - 5.8 trades/day, 49 % winners, +0.045R / +0.039R per trade (Feb–Jun / Jul–Nov), PF 1.08,
+    max DD 42R, t ≈ 1.2.
+  - With 1.5× spreads and double slippage: about +0.01R.
+  - Fixed 1:3 without trailing: −12R in total. The old defaults (≤ v1.22): −324R.
+  - Source: `reports/research/logs/r17_v130.log`.
+- **Owner demo, 2026-11-12 morning (v1.21 still running):** balance 500.16 after about 32 trades
+  over two days, i.e. about flat. This is within the normal spread of results and not evidence of
+  profit.
 - **Owner tester run, 2026-11-11 (v1.21, MetaQuotes-Demo, XAUUSD M1 real ticks, 2025.01.01 → 2026.11.01,
   S_ScalperPro + H_CrossTrail):** **0 trades** in both. All 638,414 bar checks were rejected as
   `DATA_NOT_READY` (EA defect, fixed in v1.22).
@@ -168,13 +192,19 @@ Recompiling on your own MetaEditor (F7) is recommended; keep `ALB_FOREX_EMA_CORE
 
 ## Next required action
 
-1. **Owner:** do not run Scalper Pro (or Crossover) with money that matters. On demo it only
-   repeats the measured loss. Remove it from the chart, or switch `TradingMode` to `ALERT_ONLY`.
-2. **Owner:** run `RUN_BACKTESTS.bat` once from the **v1.22** package (symbol `XAUUSD`; it may run
+1. **Owner, demo only:** replace the old Scalper Pro with **v1.30** while the panel shows
+   `Position: none`.
+   - Panel line 4 must read `Entry: SCALPER PRO X | M5 ON | BE 1.0R trail 1.5ATR | RR 4.0`.
+   - Watch that trades reaching +1R get their stop moved to +0.25R and then trailed (Journal:
+     `modified (break-even/trailing)`).
+   - On a 500 USD account at 0.5 % risk, trades whose stop costs more than about 2.4 USD per 0.01
+     lot are skipped (`MIN_LOT_EXCEEDS_RISK`). 1,000+ USD on demo avoids that.
+   - No real money.
+2. **Owner:** run `RUN_BACKTESTS.bat` once from the **v1.30** package (symbol `XAUUSD`; it may run
    for hours, overnight is fine). Send the zip from the Desktop.
    - Before starting, log MT5 in to the **IC Markets** account and close MT5.
    - The v1.21 run was on MetaQuotes-Demo, which only has real ticks from 2025-05-27.
-   - It tests **S_ScalperPro** (the control) and **H_CrossTrail** on the broker's real ticks,
+   - It tests **S_ScalperPro** (old defaults, the control) and **H_CrossTrail** (= v1.30 defaults) on the broker's real ticks,
      2025.01.01 → 2026.11.01.
 3. **Analyse the zip:**
    - If S_ScalperPro loses there too, the simulation is confirmed.

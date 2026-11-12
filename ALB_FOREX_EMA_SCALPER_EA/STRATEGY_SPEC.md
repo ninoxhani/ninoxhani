@@ -400,6 +400,42 @@ no martingale/grid/averaging, no lot increase after losses.
 All Scalper Pro thresholds are **untested placeholders** chosen from trading logic, not optimised.
 Whether this mode has an edge after costs is unknown until the `Backtest_S_*` runs are done.
 
+### 18.1 Scalper Pro robot defaults from v1.30 (owner request 2026-11-12)
+
+Owner request: let winners run (risk:reward at least 1:3, ideally 1:4), and protect trades that are
+already in profit. Research (reports/research/) showed:
+- the v1.21 defaults above lose (−0.07R per trade);
+- the least-bad variant was cross entries with a trailing stop (hypothesis H).
+
+The `ALB_FOREX_SCALPER_PRO` robot therefore opens with:
+
+| Input | v1.21 | **v1.30 default** | Why |
+|---|---|---|---|
+| `ScUseContinuation` | true | **false** | continuation entries were the biggest losers |
+| `RewardRisk` | 1.0 | **4.0** | 1:4 target; most winners exit earlier through the trailing stop |
+| `ScBreakEvenR` / `ScBreakEvenLockR` | 0.6 / 0.10 | **1.0 / 0.25** | at +1R the stop locks +0.25R: a trade that reached +1R no longer ends in a loss (except gaps) |
+| `EnableTrailingStop` / `TrailStartR` / `TrailDistanceATR` | off | **on / 1.0 / 1.5** | from +1R the stop follows the price 1.5 × ATR(M1) behind, only in the profit direction |
+| `ScStaleBars`, `ScExitOnSlowEMAClose`, `CrossCloseOnOpposite` | 10, true, true | **0, false, false** | early exits cut trades at a loss before they could run |
+
+Unchanged:
+- entry filters, stop (max loss 1R), sizing, cooldown, loss-streak pause, daily guard;
+- magic 81420262;
+- order comment, which is now `ALBFX_SCP4R` so the v1.30 trades can be told apart.
+
+Stop management (`AfxManagedStop`, self-tested):
+- the new stop is the best of the current stop, the profit-lock level and price − 1.5 ATR, and it
+  never loosens;
+- trailing-only moves are sent in steps of at least 10 % of the trail distance;
+- the first move to the profit lock is always sent.
+
+**Simulation result (proxy data, Feb–Nov 2026, real IC Markets commission):**
+- 5.8 trades/day, 49 % winners;
+- +0.045R per trade (Feb–Jun) and +0.039R (Jul–Nov);
+- PF 1.08, max drawdown 42R, t ≈ 1.2.
+
+That is better than v1.21 (−0.07R, every month negative) but **not statistically proven**, and
+with 1.5× spreads it is about break-even. Demo only until the broker-data test confirms it.
+
 ## 19. Robot files (v1.20)
 
 | File | Opens in | Magic | Notes |

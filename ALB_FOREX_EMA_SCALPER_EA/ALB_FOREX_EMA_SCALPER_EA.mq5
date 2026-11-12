@@ -11,7 +11,7 @@
 //+------------------------------------------------------------------+
 #property copyright   "ALB FOREX"
 #property link        "https://albforex.al"
-#property version     "1.22"
+#property version     "1.30"
 #property description "ALB FOREX EMA 8/14 EA - baseline: M5 trend, M1 EMA-band pullback, 1.5R."
 #property description "Also contains CROSSOVER and SCALPER PRO modes (EntryMode input)."
 #property description "Experimental research EA - NOT validated for live trading."

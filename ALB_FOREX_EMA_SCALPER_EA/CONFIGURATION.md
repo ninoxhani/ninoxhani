@@ -54,6 +54,21 @@ Everything else below has the same default in both.
 
 ## Scalper Pro (`EntryMode = SCALPER PRO`, STRATEGY_SPEC §18)
 
+> **Defaults differ per robot from v1.30.** In `ALB_FOREX_SCALPER_PRO` the following inputs open
+> with new values (STRATEGY_SPEC §18.1); the baseline robot keeps the old values listed below:
+>
+> | Input | Scalper Pro v1.30 |
+> |---|---|
+> | `ScUseContinuation` | false |
+> | `RewardRisk` | 4.0 |
+> | `ScBreakEvenR` / `ScBreakEvenLockR` | 1.0 / 0.25 |
+> | `ScStaleBars` | 0 |
+> | `ScExitOnSlowEMAClose` | false |
+> | `CrossCloseOnOpposite` | false |
+> | `EnableTrailingStop` | true |
+> | `TrailStartR` / `TrailDistanceATR` | 1.0 / 1.5 |
+> | `OrderComment` | `ALBFX_SCP4R` |
+
 | Label | Variable | Default | Unit / notes |
 |---|---|---|---|
 | M5 trend filter | `InpScTrendFilter` | true | trade only in the M5 EMA 8/14 direction |
@@ -164,7 +179,7 @@ Everything else below has the same default in both.
 | Push notifications | `InpEnablePushNotifications` | false | live only; needs MetaQuotes ID in terminal settings |
 | Journal CSV | `InpWriteJournalCsv` | true | `Common\Files\ALBFX_EMA_SCALPER_Journal_<symbol>_<magic>_<TESTER|LIVE>.csv` |
 | Extended tester report | `InpWriteTesterReport` | true | `Common\Files\ALBFX_EMA_SCALPER_Report_<symbol>_<ModeA|ModeB>.txt` + journal log |
-| Run self-tests | `InpRunSelfTests` | false | runs 108 logic checks in `OnInit`; the EA refuses to start if any fail |
+| Run self-tests | `InpRunSelfTests` | false | runs 115 logic checks in `OnInit`; the EA refuses to start if any fail |
 
 ## Rejection codes (log, journal, report)
 
@@ -206,10 +221,10 @@ Everything else below has the same default in both.
 | `Backtest_X_Crossover.set` | CROSSOVER scalper: every M1 cross, SL 1.5 ATR, TP 1R, unlimited trades, news OFF |
 | `Backtest_X_CrossTrend.set` | same, only crosses in the M5 trend direction |
 | `Demo_Scalper.set` | CROSSOVER scalper for a demo account, news ON |
-| `Backtest_S_ScalperPro.set` | **SCALPER PRO** (same settings as the Scalper Pro robot), news OFF |
+| `Backtest_S_ScalperPro.set` | **SCALPER PRO as it was up to v1.22** (1R, BE 0.6R, stale/EMA exits, crosses + continuations), news OFF — control variant |
 | `Backtest_S_ScalperPro_NoM5.set` | SCALPER PRO without the M5 trend filter (more trades) |
-| `Backtest_H_CrossTrail.set` | research hypothesis H: SCALPER PRO crosses only (`ScUseContinuation=false`), no BE/stale/EMA/opposite-cross exits, `EnableTrailingStop=true` (start 1.0R, 1.5 × ATR), `RewardRisk=4.0`. About break-even in the proxy simulation; for the broker-data test only |
-| `Demo_ScalperPro.set` | SCALPER PRO for a demo account, news ON (magic 81420262) |
+| `Backtest_H_CrossTrail.set` | **Scalper Pro v1.30 defaults**: crosses only, 4R target, profit lock +0.25R at +1R, trailing 1.5 × ATR from +1R, no early exits, news OFF |
+| `Demo_ScalperPro.set` | Scalper Pro **v1.30 defaults** for a demo account, news ON (magic 81420262) |
 | `Demo_FullAuto.set` | demo account forward test, news ON |
 | `AlertOnly.set` | signals only |
 

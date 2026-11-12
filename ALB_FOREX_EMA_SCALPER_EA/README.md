@@ -5,14 +5,20 @@ shared core:
 
 | Robot | Use it for | Opens with |
 |---|---|---|
-| **`ALB_FOREX_SCALPER_PRO`** | scalping: many quick trades | SCALPER PRO mode, unlimited trades, 1R target, magic 81420262 |
+| **`ALB_FOREX_SCALPER_PRO`** | M1 scalping that lets winners run | SCALPER PRO mode (v1.30): crosses only, 1:4 target, profit lock at +1R + trailing stop, unlimited trades, magic 81420262 |
 | `ALB_FOREX_EMA_SCALPER_EA` | the original pullback strategy | PULLBACK mode, max 5 trades/day, 1.5R, magic 81420261 |
 
-**Scalper Pro (v1.20):** enters on fresh M1 EMA 8/14 crosses **and** on pullbacks to the EMA band
-while the M1 trend lasts (max 3 per leg), only with the M5 trend, a strong candle, enough
-volatility for the spread and no news spike. Stop behind the last 5 candles, 1R target,
-break-even at +0.6R, exit when a candle closes back through EMA14, exit trades that go nowhere
-after 10 bars, 3-bar cooldown after a loss, 60-minute pause after 3 losses in a row.
+**Scalper Pro (v1.30 defaults):**
+- **Entries:** fresh M1 EMA 8/14 crosses only, with the M5 trend, a strong candle, enough
+  volatility for the spread and no news spike.
+- **Stop:** behind the last 5 candles; the maximum loss is 1R (0.5 % of equity).
+- **Target 1:4.** When a trade reaches +1R the stop moves to +0.25R. From then on it follows the
+  price 1.5 × ATR(M1) behind, so winners can run and a trade in profit is protected.
+- **No early exits.** There is a 3-bar cooldown after a loss and a 60-minute pause after 3 losses
+  in a row.
+- **Old behaviour:** up to v1.22 the robot used crosses and pullbacks, a 1R target, break-even at
+  +0.6R and EMA/stale exits. That set lost in the research and is now only the control preset
+  `Backtest_S_ScalperPro`.
 
 **Pullback baseline:**
 
@@ -22,11 +28,12 @@ after 10 bars, 3-bar cooldown after a loss, 60-minute pause after 3 losses in a 
 - **Risk:** 0.5 % of equity per trade, 2 % daily equity guard, max 5 entries/day, one position per symbol.
 - Also available via `EntryMode`: `CROSSOVER` (v1.10, every M1 cross, simple ATR stop).
 
-> **Status: RESEARCH NO-GO (2026-11-11), version 1.22.** Both robots compile with 0 errors / 0 warnings
-> (MetaEditor build 6308) and pass their 108 logic self-tests.
-> - **Simulation result:** 9 months of 1-minute gold data with broker costs. The Scalper Pro
->   defaults **lose** (−0.07R per trade, about 22 trades/day, every month negative). No tuned
->   variant passed an out-of-sample test.
+> **Status: research, demo only (version 1.30, 2026-11-12).** Both robots compile with 0 errors /
+> 0 warnings (MetaEditor build 6308) and pass their 115 logic self-tests.
+> - **Simulation, 9 months of 1-minute gold data with broker costs:**
+>   - the old Scalper Pro defaults (≤ v1.22) **lose**: −0.07R per trade, every month negative;
+>   - the v1.30 defaults come out at about +0.04R per trade in both test periods, which is
+>     **not statistically proven**, and about break-even with higher costs.
 > - **Do not trade real money with these robots.**
 > - Evidence: [research report](reports/research/2026-11-11_proxy_research_report.md) and [STATUS.md](STATUS.md).
 >   Confirmation on the broker's real ticks: run `RUN_BACKTESTS.bat` (section 6a).
@@ -82,7 +89,7 @@ If the compiler reports anything, copy the full *Errors* tab text and send it ba
 
 Optional check: attach the EA with the `Test_SelfTests.set` preset (or set
 **Run built-in logic self-tests on start = true**). The *Experts* tab must show
-`[AFX-EMA][SELFTEST] 108 passed, 0 failed`.
+`[AFX-EMA][SELFTEST] 115 passed, 0 failed`.
 
 ## 3. Enable Algo Trading
 

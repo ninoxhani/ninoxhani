@@ -1,5 +1,48 @@
 # CHANGELOG — ALB_FOREX_EMA_SCALPER_EA
 
+## 1.30 — 2026-11-12 (Scalper Pro: 1:4 target, profit lock, trailing stop)
+
+Both robots: **0 errors, 0 warnings** (MetaEditor 6308), self-tests **115 passed, 0 failed**.
+The baseline (pullback) robot's behaviour is unchanged.
+
+Owner request: "let each position run and come out with profit, risk:reward like 1:4, at least 1:3,
+and if there are losses we should not come out badly."
+
+Changed: `ALB_FOREX_SCALPER_PRO` defaults (STRATEGY_SPEC §18.1)
+- **Entries:** M1 EMA 8/14 crosses only. Continuation entries are off; they lost the most in the
+  research.
+- **Target 4R.** At +1R the stop moves to +0.25R, then trails 1.5 × ATR(M1) behind the price, only
+  in the profit direction.
+- **No early exits:** stale, slow-EMA and opposite-cross exits are off.
+- **Unchanged protection:** max loss 1R per trade (0.5 %), 3-bar cooldown, 60-min pause after 3
+  losses, 2 % daily guard.
+- **Order comment** `ALBFX_SCP4R`; magic unchanged (81420262).
+- **Simulation (proxy data, Feb–Nov 2026, real commission):** +0.045R per trade (Feb–Jun) and
+  +0.039R (Jul–Nov), 5.8 trades/day, PF 1.08, max DD 42R. That is better than the old defaults
+  (−0.07R) but **not statistically proven** (t ≈ 1.2), and about break-even with higher costs.
+  - A plain fixed 1:3 target without trailing was negative (−12R), so a "let it run" target needs
+    the trailing stop.
+
+Added
+- Per-robot default macros `AFX_DEF_SC_USE_CONT`, `AFX_DEF_SC_BE_R`, `AFX_DEF_SC_BE_LOCK_R`,
+  `AFX_DEF_SC_STALE_BARS`, `AFX_DEF_SC_EMA_EXIT`, `AFX_DEF_CLOSE_OPPOSITE`, `AFX_DEF_TRAIL`,
+  `AFX_DEF_TRAIL_ATR`. The baseline values equal the old behaviour.
+- Pure `AfxManagedStop()` (profit lock + trailing, never loosens), used by the position manager,
+  with 7 new self-tests.
+- Dashboard line 4 shows the entry types and exit setup, e.g.
+  `Entry: SCALPER PRO X | M5 ON | BE 1.0R trail 1.5ATR | RR 4.0`.
+- Extended report shows the trailing parameters.
+- `research/r17_v130.py` and its log.
+
+Changed
+- **Trailing modifications:** a move is sent only when it improves the stop by at least 10 % of the
+  trail distance, so the broker doesn't get a request every 2 seconds. The first move to the
+  profit lock is always sent.
+- **Presets:**
+  - `Backtest_H_CrossTrail` = v1.30 defaults;
+  - `Backtest_S_ScalperPro` = old defaults (control);
+  - `Demo_ScalperPro` = v1.30.
+
 ## 1.22 — 2026-11-11 (Strategy Tester fix)
 
 Both robots: **0 errors, 0 warnings** (MetaEditor 6308), self-tests **108 passed, 0 failed**.

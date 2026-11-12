@@ -9,7 +9,7 @@ unless STATUS.md says so.
 | ID | Test | Pass criterion | Evidence |
 |---|---|---|---|
 | T0.1 | Compile in MetaEditor (F7) | `0 errors, 0 warnings` | copy of the *Errors* tab |
-| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 108 passed, 0 failed` (both robots) and EA starts | *Experts*/*Journal* line |
+| T0.2 | Self-tests (`Test_SelfTests.set`) | `[AFX-EMA][SELFTEST] 115 passed, 0 failed` (both robots) and EA starts | *Experts*/*Journal* line |
 
 The self-tests cover: trend direction, band touch, Mode A BUY/SELL, Mode B touch/confirm/
 invalidation, entry-TF alignment, swing detection (strictness, right-bar confirmation,
@@ -94,9 +94,9 @@ period (trend, range, high/low volatility) from the monthly table.
 | D | `Backtest_D_BreakEven.set` | + break-even at 1R |
 | X | `Backtest_X_Crossover.set` | **different strategy**: CROSSOVER scalper, every M1 cross, SL 1.5 ATR, TP 1R, unlimited trades |
 | X-T | `Backtest_X_CrossTrend.set` | X + only crosses in the M5 trend direction |
-| S | `Backtest_S_ScalperPro.set` | **Scalper Pro** (§18): crosses + continuations, filters, BE/stale/EMA exits, 1R |
+| S | `Backtest_S_ScalperPro.set` | **Scalper Pro up to v1.22** (§18): crosses + continuations, filters, BE/stale/EMA exits, 1R (control) |
 | S-noM5 | `Backtest_S_ScalperPro_NoM5.set` | S without the M5 trend filter (more trades) |
-| H | `Backtest_H_CrossTrail.set` | S with crosses only, no early exits, trailing stop 1.5 ATR after +1R, 4R target (research hypothesis, 2026-11-11) |
+| H | `Backtest_H_CrossTrail.set` | **Scalper Pro v1.30 defaults**: crosses only, no early exits, profit lock +0.25R at +1R, trailing 1.5 ATR from +1R, 4R target |
 
 **Status 2026-11-11:**
 - **Proxy-data part:** done. 1-minute gold data and the `research/` simulator; in-sample Feb–Jun

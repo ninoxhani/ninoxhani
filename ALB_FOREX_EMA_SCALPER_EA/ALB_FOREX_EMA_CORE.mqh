@@ -41,8 +41,33 @@
 #ifndef AFX_DEF_COMMENT
    #define AFX_DEF_COMMENT       "ALBFX_EMA"
 #endif
+//--- exit / entry defaults that the Scalper Pro robot overrides (v1.30); baseline = v1.21 behaviour
+#ifndef AFX_DEF_SC_USE_CONT
+   #define AFX_DEF_SC_USE_CONT   true
+#endif
+#ifndef AFX_DEF_SC_BE_R
+   #define AFX_DEF_SC_BE_R       0.6
+#endif
+#ifndef AFX_DEF_SC_BE_LOCK_R
+   #define AFX_DEF_SC_BE_LOCK_R  0.10
+#endif
+#ifndef AFX_DEF_SC_STALE_BARS
+   #define AFX_DEF_SC_STALE_BARS 10
+#endif
+#ifndef AFX_DEF_SC_EMA_EXIT
+   #define AFX_DEF_SC_EMA_EXIT   true
+#endif
+#ifndef AFX_DEF_CLOSE_OPPOSITE
+   #define AFX_DEF_CLOSE_OPPOSITE true
+#endif
+#ifndef AFX_DEF_TRAIL
+   #define AFX_DEF_TRAIL         false
+#endif
+#ifndef AFX_DEF_TRAIL_ATR
+   #define AFX_DEF_TRAIL_ATR     1.0
+#endif
 
-#define AFX_EA_VERSION           "1.22"
+#define AFX_EA_VERSION           "1.30"
 #define AFX_STATE_VERSION        121
 #define AFX_OBJ_PREFIX           "AFXES_"
 #define AFX_MAX_RISK_PERCENT     5.0
@@ -166,12 +191,12 @@ input bool                  InpRejectAfterBarGap  = true;           // Reject si
 input int                   InpMaxSignalDelaySeconds = 30;          // Max seconds after bar open to act on a closed-candle signal
 input bool                  InpCrossUseTrendFilter = false;         // CROSSOVER: only trade crosses in the M5 trend direction
 input double                InpCrossSLATR          = 1.5;           // CROSSOVER: stop distance (x entry-TF ATR) from the trigger price
-input bool                  InpCrossCloseOnOpposite = true;         // CROSSOVER: close an open position when the EMAs cross the other way
+input bool                  InpCrossCloseOnOpposite = AFX_DEF_CLOSE_OPPOSITE; // CROSSOVER/SCALPER: close an open position when the EMAs cross the other way
 
 input group "=== Scalper Pro (EntryMode = SCALPER PRO) ==="
 input bool                  InpScTrendFilter        = true;         // SCALPER: trade only in the M5 trend direction
 input bool                  InpScUseCrossEntries    = true;         // SCALPER: enter on fresh M1 EMA crosses
-input bool                  InpScUseContinuation    = true;         // SCALPER: re-enter on pullbacks to the M1 EMA band in the trend
+input bool                  InpScUseContinuation    = AFX_DEF_SC_USE_CONT; // SCALPER: re-enter on pullbacks to the M1 EMA band in the trend
 input int                   InpScMaxEntriesPerLeg   = 3;            // SCALPER: max entries per M1 trend leg (0 = no limit)
 input int                   InpScLegLookback        = 120;          // SCALPER: bars scanned to find where the M1 leg started
 input double                InpScMinBodyRatio       = 0.40;         // SCALPER: signal candle body / range minimum (momentum)
@@ -184,11 +209,11 @@ input int                   InpScSLBars             = 5;            // SCALPER: 
 input double                InpScSLBufferATR        = 0.15;         // SCALPER: stop buffer beyond that extreme (x ATR)
 input double                InpScMinSLATR           = 0.8;          // SCALPER: minimum stop distance (x ATR, tighter stops are widened to it)
 input double                InpScMaxSLATR           = 2.5;          // SCALPER: maximum stop distance (x ATR, farther = skip)
-input double                InpScBreakEvenR         = 0.6;          // SCALPER: move SL to break-even at +N R (0 = off)
-input double                InpScBreakEvenLockR     = 0.10;         // SCALPER: R locked in when moving to break-even
-input int                   InpScStaleBars          = 10;           // SCALPER: close a trade that has not progressed after N bars (0 = off)
+input double                InpScBreakEvenR         = AFX_DEF_SC_BE_R; // SCALPER: move SL to break-even at +N R (0 = off)
+input double                InpScBreakEvenLockR     = AFX_DEF_SC_BE_LOCK_R; // SCALPER: R locked in when moving to break-even
+input int                   InpScStaleBars          = AFX_DEF_SC_STALE_BARS; // SCALPER: close a trade that has not progressed after N bars (0 = off)
 input double                InpScStaleMinR          = 0.25;         // SCALPER: progress required by then (R)
-input bool                  InpScExitOnSlowEMAClose = true;         // SCALPER: close when a candle closes beyond the slow EMA against the trade
+input bool                  InpScExitOnSlowEMAClose = AFX_DEF_SC_EMA_EXIT; // SCALPER: close when a candle closes beyond the slow EMA against the trade
 input int                   InpScCooldownBars       = 3;            // SCALPER: bars to wait after a losing trade (0 = off)
 input int                   InpScMaxConsecLosses    = 3;            // SCALPER: pause after N losses in a row (0 = off)
 input int                   InpScPauseMinutes       = 60;           // SCALPER: pause length after a loss streak (minutes)
@@ -235,9 +260,9 @@ input bool                  InpReanchorTPToFill   = true;           // After fil
 input bool                  InpEnableBreakEven    = false;          // EnableBreakEven (research variant D)
 input double                InpBreakEvenTriggerR  = 1.0;            // Break-even trigger (R)
 input int                   InpBreakEvenOffsetPoints = 0;           // Break-even lock offset (points)
-input bool                  InpEnableTrailingStop = false;          // EnableTrailingStop
+input bool                  InpEnableTrailingStop = AFX_DEF_TRAIL;  // EnableTrailingStop
 input double                InpTrailStartR        = 1.0;            // Trailing start (R)
-input double                InpTrailDistanceATR   = 1.0;            // Trailing distance (x entry-TF ATR)
+input double                InpTrailDistanceATR   = AFX_DEF_TRAIL_ATR; // Trailing distance (x entry-TF ATR)
 input bool                  InpEnableTimeExit     = false;          // EnableTimeExit
 input int                   InpMaxHoldMinutes     = 30;             // Time exit after N minutes
 
@@ -692,6 +717,26 @@ double AfxBreakEvenPrice(const int dir, const double open, const double risk, co
    return (dir > 0) ? open + lockR * risk : open - lockR * risk;
   }
 
+//--- Stop proposed by break-even + trailing management (not rounded; never loosens the stop).
+//--- beLevel: stop at +beTrigR (0 = break-even off). trailDist: distance behind the closing price
+//--- (Bid for BUY, Ask for SELL) once progress >= trailStartR x risk (0 = trailing off).
+double AfxManagedStop(const int dir, const double curSL, const double px, const double progress, const double risk,
+                      const double beTrigR, const double beLevel, const double trailStartR, const double trailDist)
+  {
+   double s = curSL;
+   if(risk <= 0.0)
+      return s;
+   if(beLevel > 0.0 && progress >= beTrigR * risk && (dir > 0 ? beLevel > s : (s <= 0.0 || beLevel < s)))
+      s = beLevel;
+   if(trailDist > 0.0 && progress >= trailStartR * risk)
+     {
+      double t = (dir > 0) ? px - trailDist : px + trailDist;
+      if(dir > 0 ? t > s : (s <= 0.0 || t < s))
+         s = t;
+     }
+   return s;
+  }
+
 //--- A trade that has not reached minR after staleBars bars is closed (scalper: get out fast).
 bool AfxStaleExit(const int barsHeld, const double progress, const double risk, const int staleBars, const double minR)
   {
@@ -1069,6 +1114,14 @@ int RunSelfTests()
    ST(!AfxStaleExit(20, 0.0, 2.0, 0, 0.25), "stale exit disabled");
    ST(AfxSlowEmaCloseExit(1, 1999.0, 2000.0) && !AfxSlowEmaCloseExit(1, 2001.0, 2000.0), "slow EMA close exit buy");
    ST(AfxSlowEmaCloseExit(-1, 2001.0, 2000.0) && !AfxSlowEmaCloseExit(-1, 1999.0, 2000.0), "slow EMA close exit sell");
+//--- v1.30 exit: profit lock at +1R (+0.25R) and trailing 3.0 behind the price (open 2000, risk 2.0)
+   ST(StEq(AfxManagedStop(1, 1998.0, 2001.0, 1.0, 2.0, 1.0, 2000.5, 1.0, 3.0), 1998.0), "managed stop: below +1R nothing moves");
+   ST(StEq(AfxManagedStop(1, 1998.0, 2002.0, 2.0, 2.0, 1.0, 2000.5, 1.0, 3.0), 2000.5), "managed stop: +1R locks +0.25R");
+   ST(StEq(AfxManagedStop(1, 2000.5, 2006.0, 6.0, 2.0, 1.0, 2000.5, 1.0, 3.0), 2003.0), "managed stop: trail follows the price");
+   ST(StEq(AfxManagedStop(1, 2004.0, 2006.0, 6.0, 2.0, 1.0, 2000.5, 1.0, 3.0), 2004.0), "managed stop: never loosens");
+   ST(StEq(AfxManagedStop(-1, 2002.0, 1998.0, 2.0, 2.0, 1.0, 1999.5, 1.0, 3.0), 1999.5), "managed stop sell: +1R locks +0.25R");
+   ST(StEq(AfxManagedStop(-1, 1999.5, 1994.0, 6.0, 2.0, 1.0, 1999.5, 1.0, 3.0), 1997.0), "managed stop sell: trail follows the price");
+   ST(StEq(AfxManagedStop(1, 1998.0, 2006.0, 6.0, 2.0, 1.0, 0.0, 1.0, 0.0), 1998.0), "managed stop: break-even and trailing off");
    double nets[5] = {5.0, -2.0, 3.0, -1.0, -1.5};
    ST(AfxTrailingLosses(nets, 5) == 2, "two losses in a row at the end");
    ST(AfxTrailingLosses(nets, 3) == 0, "no loss streak after a win");
@@ -3245,29 +3298,29 @@ void ManageOpenPositions()
       return;
    double px = (dir > 0) ? q.bid : q.ask;
    double progress = (dir > 0) ? px - open : open - px;
-   double newSL = sl;
 
-   double beTrig = scalp ? InpScBreakEvenR : InpBreakEvenTriggerR;
-   if(useBE && progress >= beTrig * risk)
+   double beTrig  = scalp ? InpScBreakEvenR : InpBreakEvenTriggerR;
+   double beLevel = 0.0;
+   if(useBE)
      {
       double off = (double)InpBreakEvenOffsetPoints * g_point;
-      double raw = scalp ? AfxBreakEvenPrice(dir, open, risk, InpScBreakEvenLockR) : ((dir > 0) ? open + off : open - off);
-      double be  = (dir > 0) ? AfxRoundDown(raw, g_tick, g_digits) : AfxRoundUp(raw, g_tick, g_digits);
-      if(dir > 0 ? (be > newSL) : (newSL <= 0.0 || be < newSL))
-         newSL = be;
+      beLevel = scalp ? AfxBreakEvenPrice(dir, open, risk, InpScBreakEvenLockR) : ((dir > 0) ? open + off : open - off);
      }
-   if(InpEnableTrailingStop && progress >= InpTrailStartR * risk)
+   double trailDist = 0.0;
+   if(InpEnableTrailingStop)
      {
       double atr = LatestClosedEntryATR();
       if(atr > 0.0)
-        {
-         double dist  = InpTrailDistanceATR * atr;
-         double trail = (dir > 0) ? AfxRoundDown(px - dist, g_tick, g_digits) : AfxRoundUp(px + dist, g_tick, g_digits);
-         if(dir > 0 ? (trail > newSL) : (newSL <= 0.0 || trail < newSL))
-            newSL = trail;
-        }
+         trailDist = InpTrailDistanceATR * atr;
      }
-   if(MathAbs(newSL - sl) < g_tick * 0.5)
+   double raw   = AfxManagedStop(dir, sl, px, progress, risk, beTrig, beLevel, InpTrailStartR, trailDist);
+   double newSL = (dir > 0) ? AfxRoundDown(raw, g_tick, g_digits) : AfxRoundUp(raw, g_tick, g_digits);
+//--- the first move to break-even is always sent; trailing-only moves go in steps of 10 % of
+//--- the trail distance so the broker is not sent a modify request every couple of seconds
+   bool beMove = (beLevel > 0.0 && progress >= beTrig * risk &&
+                  (dir > 0 ? beLevel > sl + g_tick * 0.5 : (sl <= 0.0 || beLevel < sl - g_tick * 0.5)));
+   double minStep = beMove ? g_tick * 0.5 : MathMax(g_tick * 0.5, 0.1 * trailDist);
+   if(MathAbs(newSL - sl) < minStep)
       return;
    if((long)(now - g_lastModifyTry) < 2)
       return;
@@ -3503,8 +3556,22 @@ void DashboardUpdate(const bool force)
    DashLabel(2, StringFormat("Symbol: %s   Spread: %.0f pts   Fill: %s   %s", g_sym, spreadPts, FillingName(g_filling),
                              g_isHedging ? "HEDGING" : "NETTING"), cText);
    if(InpEntryMode == AFX_ENTRY_SCALPER)
-      DashLabel(3, StringFormat("Entry: SCALPER PRO | M5 %s | BE %.1fR | stale %d | RR %.2f",
-                                InpScTrendFilter ? "ON" : "OFF", InpScBreakEvenR, InpScStaleBars, InpRewardRisk), cTitle);
+     {
+      string ex = "";
+      if(InpScBreakEvenR > 0.0)
+         ex += StringFormat("BE %.1fR ", InpScBreakEvenR);
+      if(InpEnableTrailingStop)
+         ex += StringFormat("trail %.1fATR ", InpTrailDistanceATR);
+      if(InpScStaleBars > 0)
+         ex += StringFormat("stale %d ", InpScStaleBars);
+      if(InpScExitOnSlowEMAClose)
+         ex += "EMAx ";
+      if(ex == "")
+         ex = "SL/TP only ";
+      string en = (InpScUseCrossEntries && InpScUseContinuation) ? "X+C" : (InpScUseContinuation ? "C" : "X");
+      DashLabel(3, StringFormat("Entry: SCALPER PRO %s | M5 %s | %s| RR %.1f", en,
+                                InpScTrendFilter ? "ON" : "OFF", ex, InpRewardRisk), cTitle);
+     }
    else
    if(InpEntryMode == AFX_ENTRY_CROSSOVER)
       DashLabel(3, StringFormat("Entry: CROSSOVER | trend %s | SL %.1f ATR | RR %.2f",
@@ -3664,9 +3731,10 @@ double BuildPerformanceReport(string &out)
                              InpConfirmationMode == AFX_CONFIRM_NEXT_CANDLE ? "B_NEXT_CANDLE" : "A_SAME_CANDLE",
                              BoolStr(InpEnableFlatEMAFilter), BoolStr(InpUseSeparationCheck), InpMinimumEMASeparationATR,
                              BoolStr(InpUseSlopeCheck), InpMinimumEMASlopeATR, InpSlopeBars, BoolStr(InpRequireM1EMAAlignment)));
-   AddLine(out, StringFormat("Config: risk=%.2f%% RR=%.2f dailyLoss=%.2f%% maxTrades=%d spreadRatio=%.2f drift=%.2fATR BE=%s trail=%s timeExit=%s",
+   AddLine(out, StringFormat("Config: risk=%.2f%% RR=%.2f dailyLoss=%.2f%% maxTrades=%d spreadRatio=%.2f drift=%.2fATR BE=%s trail=%s(%.1fR/%.1fATR) timeExit=%s",
                              InpRiskPercent, InpRewardRisk, InpMaxDailyLossPercent, InpMaxTradesPerDay, InpMaxSpreadToStopRatio,
-                             InpMaxEntryDriftATR, BoolStr(InpEnableBreakEven), BoolStr(InpEnableTrailingStop), BoolStr(InpEnableTimeExit)));
+                             InpMaxEntryDriftATR, BoolStr(InpEnableBreakEven), BoolStr(InpEnableTrailingStop),
+                             InpTrailStartR, InpTrailDistanceATR, BoolStr(InpEnableTimeExit)));
    AddLine(out, "News filter: " + (InpEnableNewsFilter ? g_newsStatus : "DISABLED - backtest has NO news protection (limitation)"));
 
    if(!HistorySelect(0, TimeCurrent() + 86400))

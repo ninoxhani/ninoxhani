@@ -5,8 +5,9 @@
     1. Finds your MetaTrader 5 installation and data folder.
     2. Copies the EA (.ex5/.mq5) and the presets into MT5.
     3. Runs the Strategy Tester once per variant, unattended. Default (research check 2026-11-11,
-       2025.01.01 -> 2026.11.01 on the broker's real ticks): S_ScalperPro (current Scalper Pro, the
-       control) and H_CrossTrail (best research hypothesis: crosses only + trailing stop).
+       2025.01.01 -> 2026.11.01 on the broker's real ticks): S_ScalperPro (Scalper Pro up to v1.22, the
+       control) and H_CrossTrail (Scalper Pro v1.30 defaults: crosses only, 1:4 target, profit lock
+       at +1R + trailing stop).
        Others: -Variants S_ScalperPro_NoM5,X_Crossover,X_CrossTrend,A_Baseline,B_NextCandle,C_FlatFilter,D_BreakEven
     4. Collects every report, journal and log into ONE zip on your Desktop.
 
